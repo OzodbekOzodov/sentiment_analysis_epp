@@ -108,4 +108,3 @@ def bag_of_words(text):
         # Raise an error if the input is not a string or a pandas Series
         raise ValueError("Input must be a string or a pandas Series")
     
-    
