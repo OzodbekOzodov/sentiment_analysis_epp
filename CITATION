@@ -1,0 +1,6 @@
+@Unpublished{sentiment_analysis_epp2023,
+    Title  = {A project for Effective Programming Practices for Economists class written by Ozodbek Ozodov},
+    Author = {O.Ozodov},
+    Year   = {2023},
+    Url    = {https://github.com/ozodbekozodov/sentiment_analysis_epp}
+}
