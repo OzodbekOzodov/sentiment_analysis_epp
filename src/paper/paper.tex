@@ -1,0 +1,81 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry} % Set margins
+\usepackage{times} % Use Times New Roman font
+\usepackage{graphicx} % For including figures
+\usepackage{amsmath} % For math equations
+\usepackage{natbib} % For bibliography
+
+% Title
+\title{Sentiment Analysis in Python Using Kaggle Data}
+\author{Ozodbek Ozodov}
+\date{\today}
+
+% Begin document
+\begin{document}
+
+% Title page
+\maketitle
+
+% Abstract
+\begin{abstract}
+This project uses a Kaggle dataset of financial news headlines to build and evaluate machine learning models for 
+sentiment analysis in Python. The dataset is pre-labeled as either positive or negative sentiment, and several 
+classification algorithms are trained on the data, including Naive Bayes, Support Vector Machines, Logistic Regression,
+K-Nearest Neighbors, Random Forest, and Decision Trees. The performance of each model is estimated using 
+classification metrics, including accuracy, precision, recall, and F1 score. The results show that the models 
+achieve varying degrees of accuracy, with Logistic Regression and Support Vector Machines performing the best. 
+ The project demonstrates the feasibility of using machine learning for sentiment analysis of financial news headlines.
+\end{abstract}
+
+% Introduction
+\section{Introduction}
+Sentiment analysis, also known as opinion mining, is the process of using natural language processing techniques to extract subjective information from textual data. In recent years, sentiment analysis has gained popularity in various fields such as marketing, customer service, and social media analysis. In this project, we aim to perform sentiment analysis on financial news headlines using machine learning algorithms.
+
+To achieve our goal, we used a labeled dataset from Kaggle that consists of financial news headlines along with their corresponding sentiment labels. We built and evaluated several machine learning models such as Naive Bayes, Support Vector Machines, Logistic Regression, K-Nearest Neighbors, Random Forest, and Decision Tree. We estimated various classification metrics such as accuracy, precision, recall, and F1-score to evaluate the performance of the models.
+
+The findings of this project can be useful for financial institutions, investors, and traders to gain insights into the sentiments of the market and make informed decisions. It can also be applied to other domains such as politics, social media, and product reviews to analyze public opinion and sentiment.
+% Literature review
+\section{Literature Review}
+Several studies have been conducted to explore the potential of sentiment analysis in predicting stock market trends and financial performance. However, there are still many challenges in this field, including the lack of labeled data, the complexity of financial data, and the difficulty of achieving high accuracy in predicting stock prices.
+\\
+Pang, B. and Lee, L. (2008). Opinion mining and sentiment analysis. Foundations and Trends® in Information Retrieval, 2(1-2), pp.1-135.
+This paper provides a comprehensive overview of the field of sentiment analysis, including its history, different approaches, and applications. It also discusses challenges in the field such as sarcasm and irony detection, and provides a list of publicly available sentiment analysis datasets.
+\\
+Socher, R., Perelygin, A., Wu, J.Y., Chuang, J., Manning, C.D., Ng, A. and Potts, C. (2013). Recursive deep models for semantic compositionality over a sentiment treebank. In Proceedings of the conference on empirical methods in natural language processing (EMNLP), pp. 1631-1642.
+This paper proposes a recursive neural network architecture for sentiment analysis that builds a parse tree of a sentence and assigns sentiment labels to each subtree. The model achieved state-of-the-art performance on the Stanford Sentiment Treebank dataset, and the method of building a parse tree has since become a common approach in deep learning for natural language processing.
+\\
+Mohammad, S.M. and Turney, P.D. (2010). Emotions evoked by common words and phrases: Using Mechanical Turk to create an emotion lexicon. In Proceedings of the NAACL HLT 2010 workshop on computational approaches to analysis and generation of emotion in text, pp. 26-34.
+This paper describes an approach for creating an emotion lexicon, which maps words and phrases to emotion labels such as joy, anger, and sadness. The authors used crowdsourcing on Amazon Mechanical Turk to collect ratings of emotion for a large number of words and phrases. This type of lexicon is useful for sentiment analysis, as it provides a way to quantify the emotional content of text beyond simply positive or negative sentiment.
+% Methodology
+\section{Methodology}
+The overall research goal of this project is to build and evaluate machine learning models for sentiment analysis using a Kaggle dataset of financial news headlines. To achieve this goal, several steps were taken.
+
+Firstly, the dataset was preprocessed to remove any unnecessary or irrelevant information, and to ensure that the text data was in a consistent format. This involved removing punctuation, converting all text to lowercase, and tokenizing the text into individual words.
+
+Next, the bag-of-words model was used to represent the text data in a numerical format that can be processed by machine learning algorithms. The CountVectorizer class from the scikit-learn library was used to convert the tokenized text data into a matrix of word frequencies.
+
+After the bag-of-words model was created, several machine learning algorithms were trained and evaluated on the data. This included the Naive Bayes, Support Vector Machines, and Logistic Regression algorithms. Additionally, non-parametric algorithms such as K-Nearest Neighbors, Random Forest, and Decision Tree were also used to compare with parametric models.
+
+To evaluate the performance of the machine learning models, several classification metrics were used, including accuracy, precision, recall, and F1 score. The models were trained and tested using a stratified K-fold cross-validation approach to ensure that the results were robust and unbiased.
+
+Overall, the methodology involved preprocessing the data, converting it into a numerical format using the bag-of-words model, training and evaluating several machine learning algorithms, and using appropriate classification metrics to measure their performance.
+
+% Results
+\section{Results}
+This section should present the main findings of the research.
+
+% Discussion
+\section{Discussion}
+This section should interpret and analyze the results, and discuss their implications.
+
+% Conclusion
+\section{Conclusion}
+This section should summarize the main points of the paper and provide conclusions.
+
+% References
+\bibliographystyle{apa}
+\bibliography{references}
+
+\end{document}
