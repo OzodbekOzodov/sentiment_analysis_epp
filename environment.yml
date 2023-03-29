@@ -16,7 +16,7 @@ dependencies:
   # Package dependencies
   - pytask >=0.2
   - scikit-learn
-  - matplotlib
+  - matplotlib>=3.5.1
   - numpy
   - pandas
   - pip
@@ -28,7 +28,7 @@ dependencies:
   - pytest-cov
   - pytest-xdist
   - tox-conda
-
+  - nltk
   # Documentation
   - furo
   - myst-parser
