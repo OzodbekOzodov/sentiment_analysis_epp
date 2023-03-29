@@ -15,7 +15,11 @@ dependencies:
 
   # Package dependencies
   - pytask >=0.2
-
+  - scikit-learn
+  - matplotlib
+  - numpy
+  - pandas
+  - pip
   # Misc
   - black
   - ipython
@@ -29,11 +33,8 @@ dependencies:
   - furo
   - myst-parser
   - nbsphinx
-  - sphinx
-  - sphinx-autoapi
-  - sphinx-copybutton
-  - sphinx-panels
 
   - pip:
     - -e .
     - sphinxext-opengraph
+    - black
