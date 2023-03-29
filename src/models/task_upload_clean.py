@@ -6,6 +6,7 @@ from scipy.stats import norm
 import os
 import nltk
 import pytask
+from string import punctuation
 
 @pytask.mark.task
 @pytask.mark.depends_on("data.csv")
@@ -20,7 +21,7 @@ def task_load_data(depends_on, produces):
     data = _bag_of_words(data)
 
 
-import string 
+import string
 def _clean_text(data):
     """
     Preprocess a DataFrame column of text strings for sentiment analysis by converting them to lowercase, removing
@@ -34,19 +35,19 @@ def _clean_text(data):
     """
     # Convert the text to lowercase
     data['Text'] = data['Text'].str.lower()
-
     # Replace punctuation marks with special tokens
     data['Text'] = data['Text'].str.translate(str.maketrans('', '', string.punctuation))
     data['Text'] = data['Text'].str.replace(".", " <PERIOD> ")
     data['Text'] = data['Text'].str.replace("?", " <QUESTION> ")
-    produces = "src/data_management/data_pickle.pcl"
+    produces = "src/outputs/data_pickle.pcl"
     data.to_pickle(produces)
+
     
 
 
 # data['soft_clean_text'] = clean_text_soft(data['Text'])
-
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from string import punctuation
@@ -93,36 +94,5 @@ def _bag_of_words(data):
 
 
 
-@pytask.mark.depends_on(task_load_data, produces='data_pickle.pkl"')
-@pytask.mark.produces("graph_1_sentiment_counts.png")
-def create_sentiment_plot(data, produces):
-    """Create a bar plot of the sentiment counts in the data and save it as a PNG image.
-
-    Args:
-        data (pandas.DataFrame): The data loaded from "src/data_management/data.csv".
-
-    Returns:
-        None
-    """
-    # create a pandas DataFrame with the sentiment counts
-    sentiment_counts = pd.DataFrame(data['Sentiment'].value_counts())
-
-    # create a bar plot of the sentiment counts
-    sentiment_counts.plot(kind='bar', legend=None)
-
-    # set the plot title and axis labels
-    plt.title('Sentiment Counts')
-    plt.xlabel('Sentiment')
-    plt.ylabel('Count')
-
-    # create the data_management directory if it doesn't exist
-    if not os.path.exists('data_management'):
-        os.makedirs('data_management')
-
-    # save the plot in the data_management directory
-    file_name = "src/data_management/graph_1_sentiment_counts.png"
-    if os.path.exists(file_name):
-        os.remove(file_name)
-    plt.savefig(file_name)
 
 
