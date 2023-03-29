@@ -7,6 +7,7 @@ import os
 import nltk
 import pytask
 
+@pytask.mark.task
 @pytask.mark.depends_on("data.csv")
 @pytask.mark.produces("data_pickle.pkl")
 def task_load_data(depends_on, produces):
@@ -19,7 +20,7 @@ def task_load_data(depends_on, produces):
     data = _bag_of_words(data)
 
 
-
+import string 
 def _clean_text(data):
     """
     Preprocess a DataFrame column of text strings for sentiment analysis by converting them to lowercase, removing
@@ -38,11 +39,17 @@ def _clean_text(data):
     data['Text'] = data['Text'].str.translate(str.maketrans('', '', string.punctuation))
     data['Text'] = data['Text'].str.replace(".", " <PERIOD> ")
     data['Text'] = data['Text'].str.replace("?", " <QUESTION> ")
-    data.to_pickle(src/data_management/"data_pickle.pcl")
+    produces = "src/data_management/data_pickle.pcl"
+    data.to_pickle(produces)
     
 
 
 # data['soft_clean_text'] = clean_text_soft(data['Text'])
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from string import punctuation
 
 @pytask.mark.depends_on(
                         {task_load_data,
@@ -77,7 +84,7 @@ def _bag_of_words(data):
         return ' '.join(filtered_text)
     elif isinstance(text, pd.Series):
         # If the input is a pandas Series, preprocess each element of the Series and return a new Series
-        return text.apply(bag_of_words)
+        return text.apply(_bag_of_words)
     else:
         # Raise an error if the input is not a string or a pandas Series
         raise ValueError("Input must be a string or a pandas Series")
