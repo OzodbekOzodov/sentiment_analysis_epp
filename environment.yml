@@ -17,6 +17,7 @@ dependencies:
   - pytask >=0.2
   - scikit-learn
   - matplotlib>=3.5.1
+  - seaborn
   - numpy
   - pandas
   - pip

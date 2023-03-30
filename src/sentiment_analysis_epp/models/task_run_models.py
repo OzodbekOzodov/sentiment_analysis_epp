@@ -4,9 +4,8 @@ import pytask
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from pathlib import Path
-# from config import SRC
+
 SRC = Path(__file__).parent.resolve()
-#BLD = SRC.joinpath("..", "..", "bld").resolve()
 BLD = SRC.joinpath("..", "bld").resolve()
 
 # Add the src directory to the Python module search path

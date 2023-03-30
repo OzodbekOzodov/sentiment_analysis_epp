@@ -119,14 +119,16 @@ def fit_svm(X_train, y_train, X_test, y_test):
 
 import pycrfsuite
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def fit_crf(X_train, y_train, X_test, y_test):
     def prepare_data_for_crf(X, y):
-        X_crf = X.apply(lambda x: [x.to_dict()], axis=1).tolist()
+        X_crf = pd.DataFrame(X.toarray()).apply(lambda x: x.to_dict(), axis=1).tolist()
         y_crf = y.apply(lambda x: [x]).tolist()
         return X_crf, y_crf
+
 
     # Prepare the data for CRF
     X_train_crf, y_train_crf = prepare_data_for_crf(X_train, y_train)
@@ -165,7 +167,6 @@ def fit_crf(X_train, y_train, X_test, y_test):
     })
 
     return tagger, crf_evaluation_metrics
-
 
 
 """ Second part of this script contains the codes for unsupervised ML models which does not use sentiment labels"""

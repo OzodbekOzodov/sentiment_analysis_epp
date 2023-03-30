@@ -1,14 +1,44 @@
-\documentclass[12pt]{article}
+\documentclass{article}
+\documentclass[12pt,a4paper]{article}
+\renewcommand{\baselinestretch}{1.5}
+\usepackage[left=3cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{datetime} 
+\newdateformat{monthyear}{%
+  \monthname[\THEMONTH], \THEYEAR}
 
-% Packages
-\usepackage[margin=1in]{geometry} % Set margins
-\usepackage{times} % Use Times New Roman font
-\usepackage{graphicx} % For including figures
-\usepackage{amsmath} % For math equations
-\usepackage{natbib} % For bibliography
+\usepackage{graphicx}
 
+\usepackage{natbib} % need for nice bibliography
+\usepackage{xcolor}
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = blue,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}
+
+
+
+
+%__________________
+
+
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+%\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+%\usepackage[a4paper,top=3cm,bottom=3cm,left=3cm,right=3cm,marginparwidth=3cm]{geometry}
+%\usepackage{setspace}
+%\setstretch{1.6}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
 % Title
-\title{Sentiment Analysis in Python Using Kaggle Data}
+\title{Sentiment Analysis in Python Using Kaggle Dataset}
 \author{Ozodbek Ozodov}
 \date{\today}
 
@@ -38,18 +68,18 @@ To achieve our goal, we used a labeled dataset from Kaggle that consists of fina
 The findings of this project can be useful for financial institutions, investors, and traders to gain insights into the sentiments of the market and make informed decisions. It can also be applied to other domains such as politics, social media, and product reviews to analyze public opinion and sentiment.
 % Literature review
 \section{Literature Review}
+
 Several studies have been conducted to explore the potential of sentiment analysis in predicting stock market trends and financial performance. However, there are still many challenges in this field, including the lack of labeled data, the complexity of financial data, and the difficulty of achieving high accuracy in predicting stock prices.
-\\
+
 Pang, B. and Lee, L. (2008). Opinion mining and sentiment analysis. Foundations and Trends® in Information Retrieval, 2(1-2), pp.1-135.
 This paper provides a comprehensive overview of the field of sentiment analysis, including its history, different approaches, and applications. It also discusses challenges in the field such as sarcasm and irony detection, and provides a list of publicly available sentiment analysis datasets.
-\\
-Socher, R., Perelygin, A., Wu, J.Y., Chuang, J., Manning, C.D., Ng, A. and Potts, C. (2013). Recursive deep models for semantic compositionality over a sentiment treebank. In Proceedings of the conference on empirical methods in natural language processing (EMNLP), pp. 1631-1642.
-This paper proposes a recursive neural network architecture for sentiment analysis that builds a parse tree of a sentence and assigns sentiment labels to each subtree. The model achieved state-of-the-art performance on the Stanford Sentiment Treebank dataset, and the method of building a parse tree has since become a common approach in deep learning for natural language processing.
-\\
-Mohammad, S.M. and Turney, P.D. (2010). Emotions evoked by common words and phrases: Using Mechanical Turk to create an emotion lexicon. In Proceedings of the NAACL HLT 2010 workshop on computational approaches to analysis and generation of emotion in text, pp. 26-34.
-This paper describes an approach for creating an emotion lexicon, which maps words and phrases to emotion labels such as joy, anger, and sadness. The authors used crowdsourcing on Amazon Mechanical Turk to collect ratings of emotion for a large number of words and phrases. This type of lexicon is useful for sentiment analysis, as it provides a way to quantify the emotional content of text beyond simply positive or negative sentiment.
+
+Socher, R., Perelygin, A., Wu, J.Y., Chuang, J., Manning, C.D., Ng, A. and Potts, C. (2013). Recursive deep models for semantic compositionality over a sentiment treebank. In Proceedings of the conference on empirical methods in natural language processing (EMNLP), pp. 1631-1642. This paper proposes a recursive neural network architecture for sentiment analysis that builds a parse tree of a sentence and assigns sentiment labels to each subtree. The model achieved state-of-the-art performance on the Stanford Sentiment Treebank dataset, and the method of building a parse tree has since become a common approach in deep learning for natural language processing.
+
+Mohammad, S.M. and Turney, P.D. (2010). Emotions evoked by common words and phrases: Using Mechanical Turk to create an emotion lexicon. In Proceedings of the NAACL HLT 2010 workshop on computational approaches to analysis and generation of emotion in text, pp. 26-34. This paper describes an approach for creating an emotion lexicon, which maps words and phrases to emotion labels such as joy, anger, and sadness. The authors used crowdsourcing on Amazon Mechanical Turk to collect ratings of emotion for a large number of words and phrases. This type of lexicon is useful for sentiment analysis, as it provides a way to quantify the emotional content of text beyond simply positive or negative sentiment.
 % Methodology
 \section{Methodology}
+
 The overall research goal of this project is to build and evaluate machine learning models for sentiment analysis using a Kaggle dataset of financial news headlines. To achieve this goal, several steps were taken.
 
 Firstly, the dataset was preprocessed to remove any unnecessary or irrelevant information, and to ensure that the text data was in a consistent format. This involved removing punctuation, converting all text to lowercase, and tokenizing the text into individual words.
@@ -61,6 +91,100 @@ After the bag-of-words model was created, several machine learning algorithms we
 To evaluate the performance of the machine learning models, several classification metrics were used, including accuracy, precision, recall, and F1 score. The models were trained and tested using a stratified K-fold cross-validation approach to ensure that the results were robust and unbiased.
 
 Overall, the methodology involved preprocessing the data, converting it into a numerical format using the bag-of-words model, training and evaluating several machine learning algorithms, and using appropriate classification metrics to measure their performance.
+
+\subsection{Logistic Regression}
+
+Logistic regression is a popular statistical model that is commonly used in machine learning for binary classification problems. It models the probability of a binary outcome, such as the sentiment of a financial news headline being positive, negative, or neutral, based on one or more predictor variables. The logistic regression model is based on the logistic function, which transforms the linear combination of the predictor variables into a probability value between 0 and 1.
+
+The logistic function is defined as:
+
+\sigma (z) = \frac{1}{1+e^{-z}}
+
+where:
+
+z = \beta_0+\beta_1x_1 + \beta_2x_2+...+\beta_p x_p
+ 
+
+The coefficients β are estimated using maximum likelihood estimation, which seeks to find the values of β that maximize the likelihood of the observed data given the model.
+
+In the case of financial news sentiment analysis, logistic regression can be used to classify headlines as positive, negative, or neutral based on the presence of certain keywords or phrases. To use logistic regression for this task, each headline is first represented numerically as a vector of features, where each feature represents the presence or absence of a particular keyword or phrase. These features are then used as the input to the logistic regression model, which outputs a probability for each class label.
+
+The logistic regression model works by fitting a logistic function to the input features. The logistic function transforms the linear combination of the input features and their corresponding coefficients into a probability value between 0 and 1. The coefficients are learned through a process called maximum likelihood estimation, which seeks to find the values of the coefficients that maximize the likelihood of the observed data given the model.
+
+One advantage of logistic regression is its simplicity and interpretability. The coefficients learned by the model can be used to identify which features are most important for predicting each class label. Furthermore, logistic regression can handle both categorical and continuous input features, making it a versatile modeling approach.
+
+However, logistic regression also has some limitations. For instance, it assumes that the relationship between the input features and the output variable is linear, which may not always be the case. Additionally, logistic regression may struggle with datasets that have a large number of input features or features that are highly correlated with each other.
+
+In summary, logistic regression is a widely-used approach for binary classification problems, such as financial news sentiment analysis. By representing each headline numerically and fitting a logistic function to the input features, logistic regression can accurately classify headlines as positive, negative, or neutral. While logistic regression has its limitations, it remains a useful and effective modeling technique for classification problems in finance and other fields.
+
+\subsection{Naive Bayes Classifier}
+
+Naive Bayes is a probabilistic machine learning algorithm that is commonly used in text classification tasks, such as sentiment analysis. The algorithm is based on Bayes' theorem, which describes the probability of an event occurring based on prior knowledge.
+
+In the context of financial news sentiment analysis, the Naive Bayes algorithm can be used to classify headlines as positive, negative, or neutral based on the presence of certain words or phrases. To use Naive Bayes for this task, each headline is first represented numerically as a vector of features, where each feature represents the presence or absence of a particular word or phrase. These features are then used as the input to the Naive Bayes model, which outputs a probability for each class label.
+
+The Naive Bayes algorithm works by making the assumption that the presence of a particular feature in a class is independent of the presence of other features in the same class. This is known as the "naive" assumption, and it simplifies the calculations required to estimate the probabilities of each class.
+
+Given a set of training examples, the Naive Bayes algorithm estimates the prior probability of each class, as well as the conditional probability of each feature given each class. These probabilities are then used to compute the posterior probability of each class given the input features using Bayes' theorem:
+
+P(c_i|x) = \frac{P(c_i) \prod^{n}_{j=1}P(x_k|c_i)}{\sum^{k}_{k=1}\prod^{n}_{j=1}P(x_j|c_k)}
+
+
+where $P(c_i|\mathbf{x})$ is the posterior probability of class $c_i$ given the input features $\mathbf{x}$, $P(c_i)$ is the prior probability of class $c_i$, $P(x_j|c_i)$ is the conditional probability of feature $x_j$ given class $c_i$, $n$ is the number of features, and $K$ is the number of classes.
+
+To classify a new headline, the Naive Bayes algorithm computes the posterior probability of each class given the input features and assigns the class with the highest probability as the predicted class label.
+
+One advantage of Naive Bayes is its simplicity and speed, as it requires relatively few training examples and can be trained efficiently on large datasets. However, Naive Bayes may not perform as well as more complex algorithms on datasets with highly correlated features or complex relationships between features and class labels.
+
+In summary, Naive Bayes is a probabilistic machine learning algorithm that is commonly used in text classification tasks, such as financial news sentiment analysis. By making the "naive" assumption that the presence of features is independent of each other, Naive Bayes can estimate the probabilities of each class given the input features using Bayes' theorem. While Naive Bayes is a simple and effective algorithm, it may not perform as well as more complex algorithms on certain datasets.
+
+\subsection{Support Vector Machines}
+
+Support Vector Machines (SVMs) are a powerful and widely used machine learning algorithm for classification and regression problems. In the context of sentiment analysis using financial news headlines, SVMs can be used to classify headlines as positive, negative, or neutral based on the presence of certain words or phrases.
+
+SVMs work by finding the hyperplane that maximally separates the different classes in the input feature space. In the case of sentiment analysis, each headline is first represented numerically as a vector of features, where each feature represents the presence or absence of a particular word or phrase. These features are then used as the input to the SVM model, which aims to find the hyperplane that best separates the different classes.
+
+Mathematically, the SVM model seeks to find the hyperplane that maximizes the margin between the classes, where the margin is defined as the distance between the hyperplane and the closest data points from each class. The hyperplane is defined as:
+
+w \cdot  x + b = 0
+
+where $\mathbf{w}$ is the weight vector, $\mathbf{x}$ is the input feature vector, and $b$ is the bias term.
+
+To train an SVM model, the algorithm seeks to find the optimal values of $\mathbf{w}$ and $b$ that maximize the margin between the classes while correctly classifying the training data. This is done by solving the following optimization problem:
+
+min_w,_b\frac{1}{2}||w||^2 $ subject to $ y_i(w) \dot x_i + b)\geq 1  $ for all $ i
+
+where $y_i$ is the class label of the $i$th data point and $|\mathbf{w}|^2$ is the L2 norm of the weight vector.
+
+In practice, the SVM model can also be extended to handle non-linearly separable data by using a kernel function to map the input features to a higher-dimensional space where the data is more easily separable. The most commonly used kernel functions are the linear kernel, polynomial kernel, and radial basis function (RBF) kernel.
+
+One advantage of SVMs is their ability to handle high-dimensional data and non-linear decision boundaries. SVMs are also known for their robustness to overfitting and their ability to handle noisy data.
+
+However, SVMs can be computationally intensive and require careful selection of hyperparameters, such as the choice of kernel function and the regularization parameter.
+
+In summary, Support Vector Machines are a powerful machine learning algorithm for classification problems, such as financial news sentiment analysis. By finding the hyperplane that maximizes the margin between the classes, SVMs can accurately classify headlines as positive, negative, or neutral based on the presence of certain words or phrases. While SVMs have certain advantages and limitations, they remain a popular and effective approach to classification problems in finance and other fields.
+
+\subsection{Conditional Random Field}
+
+Conditional Random Fields (CRFs) are a probabilistic graphical model that is widely used for sequence labeling tasks, such as named entity recognition and part-of-speech tagging. In the context of sentiment analysis using financial news headlines, CRFs can be used to label each word in the headline as positive, negative, or neutral based on the context of the entire headline.
+
+To use CRFs for this task, the input is typically represented as a sequence of words or tokens, where each token is associated with a set of features that capture the relevant information for sentiment analysis. These features might include the presence of certain keywords or phrases, as well as more complex features such as the part-of-speech or the dependency parse tree of the token.
+
+Mathematically, the CRF model defines a conditional probability distribution over the possible sequence labels given the input sequence of features. Specifically, the model computes the probability of a sequence of labels $\mathbf{y}$ given a sequence of features $\mathbf{x}$ as follows:
+
+
+P(y|x) = $\frac{1}{z(x)}$     exp\left\{\sum_{i=1}^{n} \sum_{j=1}^{k} w_i f_i (y_i, y_{i-1}, x,i)\right\}
+
+
+where $n$ is the length of the input sequence, $k$ is the number of unique transition features, $w_j$ is the weight parameter associated with the $j$th transition feature, $f_j(y_i, y_{i-1}, \mathbf{x}, i)$ is the value of the $j$th transition feature function for the labels $y_i$ and $y_{i-1}$ at position $i$ in the sequence, and $Z(\mathbf{x})$ is the normalization constant that ensures the probabilities sum to 1.
+
+The goal of training a CRF model is to estimate the optimal weight parameters that maximize the likelihood of the observed data. This is typically done using the maximum likelihood estimation method or its variants, such as the gradient descent algorithm.
+
+One advantage of CRFs is their ability to model dependencies between adjacent labels in the input sequence, which can capture the context and correlation between words in a sentence. Additionally, CRFs can handle both categorical and continuous input features, making them a versatile modeling approach.
+
+However, CRFs can be computationally expensive to train and may require careful feature engineering to achieve optimal performance.
+
+In summary, Conditional Random Fields are a probabilistic graphical model that is widely used for sequence labeling tasks, such as financial news sentiment analysis. By modeling the dependencies between adjacent labels in the input sequence, CRFs can accurately label each word in the headline as positive, negative, or neutral based on the context of the entire headline. While CRFs have certain advantages and limitations, they remain a popular and effective approach to sequence labeling problems in finance and other fields.
 
 % Results
 \section{Results}
