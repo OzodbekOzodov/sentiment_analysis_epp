@@ -54,7 +54,7 @@ def task_preprocess_data():
 import pandas as pd
 import pickle
 from pathlib import Path
-from sentiment_analysis_epp.models.models import fit_logit_model, fit_naive_bayes, fit_svm
+from sentiment_analysis_epp.models.models import fit_logit_model, fit_naive_bayes, fit_svm, fit_crf
 import pytask
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -64,6 +64,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
     BLD / "python" / "models" / "logit_model.pkl",
     BLD / "python" / "models" / "naive_bayes_model.pkl",
     BLD / "python" / "models" / "svm_model.pkl",
+    BLD / "python" / "models" / "crf_model.pkl",
     BLD / "python" / "evaluation_metrics.csv",
 ])
 def task_run_models(depends_on, produces):
@@ -82,7 +83,7 @@ def task_run_models(depends_on, produces):
     logit_model, logit_evaluation = fit_logit_model(X_train, y_train, X_test, y_test)
     nb_model, nb_evaluation = fit_naive_bayes(X_train, y_train, X_test, y_test)
     svm_model, svm_evaluation = fit_svm(X_train, y_train, X_test, y_test)
-
+    crf_model, crf_evaluation = fit_crf(X_train, y_train, X_test, y_test)
     # Save models
     with open(produces[0], "wb") as f:
         pickle.dump(logit_model, f)
@@ -90,23 +91,24 @@ def task_run_models(depends_on, produces):
         pickle.dump(nb_model, f)
     with open(produces[2], "wb") as f:
         pickle.dump(svm_model, f)
+    with open(produces[3], "wb") as f:
+        pickle.dump(crf_model, f)
+
 
     # Save evaluation metrics
-    evaluation_metrics = pd.concat([logit_evaluation, nb_evaluation, svm_evaluation], axis=0)
-    evaluation_metrics.index = ["logit", "naive_bayes", "svm"]
+    evaluation_metrics = pd.concat([logit_evaluation, nb_evaluation, svm_evaluation, crf_evaluation], axis=0)
+    evaluation_metrics.index = ["logit", "naive_bayes", "svm", "crf"]
     evaluation_metrics.to_csv(produces[3], index_label="Model")
 
     return None
 
 
+
 from sentiment_analysis_epp.models.models import lda_topic_modeling
-
-
-
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
 @pytask.mark.produces([
-    BLD / "python" / "models" / "data_with_topics.pkl",
-    BLD / "python" / "models" / "topic_examples.pkl",
+    BLD / "python" / "models" / "data_with_topics.csv",
+    BLD / "python" / "models" / "topic_examples.csv",
 ])
 def task_run_topic_lda(depends_on, produces):
     # Load preprocessed data
@@ -114,7 +116,7 @@ def task_run_topic_lda(depends_on, produces):
         data = pickle.load(f)
 
     # Run LDA topic modeling
-    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=5, n_keywords=10) #, random_state=42)
+    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=20, n_keywords=20) #, random_state=42)
 
     # Save DataFrames
     data_with_topics.to_csv(produces[0],index = False)

@@ -115,6 +115,58 @@ def fit_svm(X_train, y_train, X_test, y_test):
 
     return svm_model, svm_evaluation_metrics
 
+""" Conditional random field """
+
+import pycrfsuite
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+def fit_crf(X_train, y_train, X_test, y_test):
+    def prepare_data_for_crf(X, y):
+        X_crf = X.apply(lambda x: [x.to_dict()], axis=1).tolist()
+        y_crf = y.apply(lambda x: [x]).tolist()
+        return X_crf, y_crf
+
+    # Prepare the data for CRF
+    X_train_crf, y_train_crf = prepare_data_for_crf(X_train, y_train)
+    X_test_crf, y_test_crf = prepare_data_for_crf(X_test, y_test)
+
+    # Fit the CRF model
+    trainer = pycrfsuite.Trainer(verbose=False)
+
+    for xseq, yseq in zip(X_train_crf, y_train_crf):
+        trainer.append(xseq, yseq)
+
+    trainer.set_params({
+        'c1': 1.0,   # coefficient for L1 penalty
+        'c2': 1e-3,  # coefficient for L2 penalty
+        'max_iterations': 50  # stop earlier
+    })
+
+    trainer.train('crf_model.crfsuite')
+
+    # Evaluate the model on the test set
+    tagger = pycrfsuite.Tagger()
+    tagger.open('crf_model.crfsuite')
+    y_pred = [tagger.tag(xseq)[0] for xseq in X_test_crf]
+
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+
+    # Create a pandas DataFrame with the evaluation metrics
+    crf_evaluation_metrics = pd.DataFrame({
+        'accuracy': [accuracy],
+        'precision': [precision],
+        'recall': [recall],
+        'f1_score': [f1]
+    })
+
+    return tagger, crf_evaluation_metrics
+
+
 
 """ Second part of this script contains the codes for unsupervised ML models which does not use sentiment labels"""
 
@@ -123,7 +175,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 import numpy as np 
 
-def lda_topic_modeling(data, n_topics=10, n_keywords=10):
+def lda_topic_modeling(data, n_topics=20, n_keywords=20):
     """
     Perform LDA topic modeling on the given data.
 
@@ -136,6 +188,9 @@ def lda_topic_modeling(data, n_topics=10, n_keywords=10):
     data_with_topics (pd.DataFrame): A DataFrame with an additional 'Topic' column containing the topic number.
     topic_examples (pd.DataFrame): A DataFrame containing one example headline from each topic.
     """
+
+    # Convert the list of words to a single string
+    data['bag_of_words'] = data['bag_of_words'].apply(lambda x: ' '.join(str(word) for word in x))
 
     # Initialize a CountVectorizer object with the previously processed bag_of_words data
     vectorizer = CountVectorizer(analyzer=lambda x: x)
