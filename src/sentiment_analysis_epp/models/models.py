@@ -22,65 +22,38 @@ def preprocess_data(data):
 
     return data
 
-
-
-def fit_logit_model(data):
-    """Fit a logistic regression model to data.
-
-    Args:
-        data (pandas.DataFrame): The data set.
-
-    Returns:
-        tuple: The fitted model (sklearn.linear_model.LogisticRegression) and a pandas DataFrame containing the accuracy, precision, recall, and F1 scores.
-    """
-    X = data['bag_of_words']
-    y = data['sentiment']
-
-    # Split data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
+def fit_logit_model(X_train, y_train, X_test, y_test):
     # Fit the logistic regression model
     logit_model = LogisticRegression()
     logit_model.fit(X_train, y_train)
 
     # Evaluate the model on the test set
     y_pred = logit_model.predict(X_test)
+
+    # Compute evaluation metrics
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred, average='weighted')
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
 
-    # Create a pandas DataFrame with the evaluation metrics
-    logit_evaluation_metrics = pd.DataFrame({
-        'accuracy': [accuracy],
-        'precision': [precision],
-        'recall': [recall],
-        'f1_score': [f1]
+    # Store the evaluation metrics in a dictionary
+    logit_model_evaluation = pd.DataFrame.from_dict({
+        "accuracy": [accuracy],
+        "precision": [precision],
+        "recall": [recall],
+        "f1_score": [f1]
     })
 
-    return logit_model, logit_evaluation_metrics
+    return logit_model, logit_model_evaluation
+
+
 
 import pandas as pd
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
-
-def fit_naive_bayes(data):
-    """Fit a Naive Bayes classifier to data.
-
-    Args:
-        data (pandas.DataFrame): The data set.
-
-    Returns:
-        tuple: The fitted model (sklearn.naive_bayes.MultinomialNB) and a pandas DataFrame containing the accuracy, precision, recall, and F1 scores.
-    """
-    X = data['bag_of_words']
-    y = data['sentiment']
-
-    # Split data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Fit the Naive Bayes classifier
+def fit_naive_bayes(X_train, y_train, X_test, y_test):
+    # Fit the Naive Bayes model
     nb_model = MultinomialNB()
     nb_model.fit(X_train, y_train)
 
@@ -106,21 +79,18 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 
-def fit_svm(data):
+def fit_svm(X_train, y_train, X_test, y_test):
     """Fit a Support Vector Machine classifier to data.
 
     Args:
-        data (pandas.DataFrame): The data set.
+        X_train (pandas.DataFrame): The training data set.
+        y_train (pandas.Series): The training target labels.
+        X_test (pandas.DataFrame): The test data set.
+        y_test (pandas.Series): The test target labels.
 
     Returns:
         tuple: The fitted model (sklearn.svm.SVC) and a pandas DataFrame containing the accuracy, precision, recall, and F1 scores.
     """
-    X = data['bag_of_words']
-    y = data['sentiment']
-
-    # Split data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     # Fit the Support Vector Machine classifier
     svm_model = SVC()
     svm_model.fit(X_train, y_train)
@@ -141,7 +111,6 @@ def fit_svm(data):
     })
 
     return svm_model, svm_evaluation_metrics
-
 
 
 

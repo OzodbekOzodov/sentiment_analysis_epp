@@ -51,34 +51,49 @@ def task_preprocess_data():
     return None
 
 
-# DATA_PATH = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "data_management", "data.csv")
+import pandas as pd
+import pickle
+from pathlib import Path
+from sentiment_analysis_epp.models.models import fit_logit_model, fit_naive_bayes, fit_svm
+import pytask
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-
-
-"""
-@pytask.mark.depends_on(DATA_PATH)
-@pytask.mark.produces(["logit_model", "naive_bayes_model", "svm_model", "evaluation_metrics"])
+@pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
+@pytask.mark.produces([
+    BLD / "python" / "models" / "logit_model.pkl",
+    BLD / "python" / "models" / "naive_bayes_model.pkl",
+    BLD / "python" / "models" / "svm_model.pkl",
+    BLD / "python" / "evaluation_metrics.csv",
+])
 def task_run_models(depends_on, produces):
-    # Read the data
-    data = pd.read_csv(depends_on, encoding='ISO-8859-1')
+    # Load preprocessed data
+    with open(depends_on, "rb") as f:
+        data = pickle.load(f)
 
-    # Preprocess the 'bag_of_words' column
-    vectorizer = CountVectorizer()
-    data['bag_of_words'] = vectorizer.fit_transform(data['Text'])
+    # Vectorize the 'Text' column
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(data['Text'])
 
-    # Run the models
-    logit_model, logit_evaluation = fit_logit_model(data)
-    nb_model, nb_evaluation = fit_naive_bayes(data)
-    svm_model, svm_evaluation = fit_svm(data)
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, data['Sentiment'], random_state=42)
 
-    # Save the evaluation metrics
+    # Fit models
+    logit_model, logit_evaluation = fit_logit_model(X_train, y_train, X_test, y_test)
+    nb_model, nb_evaluation = fit_naive_bayes(X_train, y_train, X_test, y_test)
+    svm_model, svm_evaluation = fit_svm(X_train, y_train, X_test, y_test)
+
+    # Save models
+    with open(produces[0], "wb") as f:
+        pickle.dump(logit_model, f)
+    with open(produces[1], "wb") as f:
+        pickle.dump(nb_model, f)
+    with open(produces[2], "wb") as f:
+        pickle.dump(svm_model, f)
+
+    # Save evaluation metrics
     evaluation_metrics = pd.concat([logit_evaluation, nb_evaluation, svm_evaluation], axis=0)
     evaluation_metrics.index = ["logit", "naive_bayes", "svm"]
-    evaluation_metrics.to_csv(produces[3])
+    evaluation_metrics.to_csv(produces[3], index_label="Model")
 
-    # Store the models in memory
-    produces[0] = logit_model
-    produces[1] = nb_model
-    produces[2] = svm_model
-
-    """
+    return None
