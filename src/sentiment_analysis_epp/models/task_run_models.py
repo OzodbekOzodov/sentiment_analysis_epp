@@ -97,3 +97,23 @@ def task_run_models(depends_on, produces):
     evaluation_metrics.to_csv(produces[3], index_label="Model")
 
     return None
+
+
+@pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
+@pytask.mark.produces([
+    BLD / "python" / "models" / "data_with_topics.pkl",
+    BLD / "python" / "models" / "topic_examples.pkl",
+])
+def task_run_topic_lda(depends_on, produces):
+    # Load preprocessed data
+    with open(depends_on, "rb") as f:
+        data = pickle.load(f)
+
+    # Run LDA topic modeling
+    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=5, n_keywords=10, random_state=42)
+
+    # Save DataFrames
+    data_with_topics.to_pickle(produces[0])
+    topic_examples.to_pickle(produces[1])
+
+    return None
