@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 import pickle
 
-
 def preprocess_data(data):
     # Instantiate a CountVectorizer object
     vectorizer = CountVectorizer()
@@ -13,14 +12,18 @@ def preprocess_data(data):
     # Convert the 'Text' column to bag of words representation
     bag_of_words = vectorizer.fit_transform(data['Text'])
 
-    # Store the result in a new column 'bag_of_words'
-    data['bag_of_words'] = bag_of_words.toarray().tolist()
+    # Store the result in a new column 'bag_of_words' as a list of strings
+    data['bag_of_words'] = [list(map(str, words)) for words in bag_of_words.toarray()]
+
+    # Convert all integers to strings in the 'bag_of_words' column
+    data['bag_of_words'] = data['bag_of_words'].apply(lambda x: [str(item) for item in x])
 
     # Save the preprocessed data as a pickle file
     with open('src/sentiment_analysis_epp/data_management/preprocessed_data.pkl', 'wb') as f:
         pickle.dump(data, f)
 
     return data
+
 
 def fit_logit_model(X_train, y_train, X_test, y_test):
     # Fit the logistic regression model
@@ -118,36 +121,42 @@ def fit_svm(X_train, y_train, X_test, y_test):
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
+import numpy as np 
 
-def lda_topic_modeling(data, n_topics=5, n_keywords=10, random_state=42):
+def lda_topic_modeling(data, n_topics=10, n_keywords=10):
     """
-    Perform LDA topic modeling on a dataset with a "bag_of_words" column and assign topics.
-    
+    Perform LDA topic modeling on the given data.
+
     Args:
-        data (pd.DataFrame): A DataFrame containing a "bag_of_words" column with clean text data.
-        n_topics (int): The number of topics to be identified by the LDA model.
-        n_keywords (int): The number of top keywords to display for each topic.
-        random_state (int): The random state value for reproducibility.
-        
+    data (pd.DataFrame): A DataFrame containing the preprocessed data with a 'bag_of_words' column.
+    n_topics (int): The number of topics to generate.
+    n_keywords (int): The number of keywords to display for each topic.
+
     Returns:
-        data_with_topics (pd.DataFrame): A DataFrame with the original data and an additional "topics" column containing the assigned topics.
-        topic_examples (pd.DataFrame): A DataFrame containing one example headline from each topic class along with its sentiment and topic assignment.
+    data_with_topics (pd.DataFrame): A DataFrame with an additional 'Topic' column containing the topic number.
+    topic_examples (pd.DataFrame): A DataFrame containing one example headline from each topic.
     """
-    # Create a CountVectorizer object
-    vectorizer = CountVectorizer()
-    doc_term_matrix = vectorizer.fit_transform(data['bag_of_words'])
 
-    # Fit the LDA model
-    lda_model = LatentDirichletAllocation(n_components=n_topics, random_state=random_state)
-    lda_model.fit(doc_term_matrix)
+    # Initialize a CountVectorizer object with the previously processed bag_of_words data
+    vectorizer = CountVectorizer(analyzer=lambda x: x)
+    bag_of_words = vectorizer.fit_transform(data['bag_of_words'])
 
-    # Assign topics to the headlines
-    data_with_topics = data.copy()
-    data_with_topics['topics'] = lda_model.transform(doc_term_matrix).argmax(axis=1)
+    # Perform LDA topic modeling
+    lda = LatentDirichletAllocation(n_components=n_topics)
+    lda.fit(bag_of_words)
 
-    # Collect one example for each topic
-    topic_examples = data_with_topics.groupby('topics').first().reset_index()[['Text', 'Sentiment', 'topics']]
+    # Get the topic keywords
+    keywords = np.array(vectorizer.get_feature_names_out())
+    topic_keywords = []
+    for topic_weights in lda.components_:
+        top_keyword_locs = (-topic_weights).argsort()[:n_keywords]
+        topic_keywords.append(keywords.take(top_keyword_locs).tolist())
 
-    return data_with_topics, topic_examples
+    # Assign a topic to each document
+    topic_values = lda.transform(bag_of_words)
+    data['Topic'] = topic_values.argmax(axis=1)
 
+    # Get one example headline from each topic
+    topic_examples = data.groupby('Topic').first()
 
+    return data, topic_examples

@@ -99,6 +99,10 @@ def task_run_models(depends_on, produces):
     return None
 
 
+from sentiment_analysis_epp.models.models import lda_topic_modeling
+
+
+
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
 @pytask.mark.produces([
     BLD / "python" / "models" / "data_with_topics.pkl",
@@ -110,10 +114,11 @@ def task_run_topic_lda(depends_on, produces):
         data = pickle.load(f)
 
     # Run LDA topic modeling
-    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=5, n_keywords=10, random_state=42)
+    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=5, n_keywords=10) #, random_state=42)
 
     # Save DataFrames
-    data_with_topics.to_pickle(produces[0])
-    topic_examples.to_pickle(produces[1])
+    data_with_topics.to_csv(produces[0],index = False)
+    topic_examples.to_csv(produces[1], index=False)
+
 
     return None
