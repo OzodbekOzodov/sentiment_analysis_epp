@@ -125,9 +125,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def fit_crf(X_train, y_train, X_test, y_test):
     def prepare_data_for_crf(X, y):
-        X_crf = pd.DataFrame(X.toarray()).apply(lambda x: x.to_dict(), axis=1).tolist()
-        y_crf = y.apply(lambda x: [x]).tolist()
+        X_crf = pd.DataFrame(X.toarray()).apply(lambda x: {str(k): v for k, v in x.to_dict().items()}, axis=1).tolist()
+        y_crf = [[str(label)] for label in y]
         return X_crf, y_crf
+
 
 
     # Prepare the data for CRF

@@ -1,12 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def plot_sentiment_hist(data_path, save_path=None):
-    # Load data
-    data = pd.read_csv(data_path)
-
+def plot_sentiment_hist(df, save_path=None):
     # Count the number of sentiments for each class
-    sentiment_counts = data["Sentiment"].value_counts()
+    sentiment_counts = df["Sentiment"].value_counts()
 
     # Set up the figure
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -22,6 +19,3 @@ def plot_sentiment_hist(data_path, save_path=None):
     # Save the figure if a save path is provided
     if save_path:
         fig.savefig(save_path, dpi=300, bbox_inches="tight")
-
-    # Show the figure
-    plt.show()
