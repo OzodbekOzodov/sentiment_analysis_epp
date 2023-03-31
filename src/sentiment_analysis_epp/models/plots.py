@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
+
 
 def plot_sentiment_hist(df, save_path=None):
     # Count the number of sentiments for each class
@@ -9,7 +11,7 @@ def plot_sentiment_hist(df, save_path=None):
     fig, ax = plt.subplots(figsize=(8, 6))
 
     # Create the histogram
-    ax.bar(sentiment_counts.index, sentiment_counts.values, color=["#9b59b6", "#3498db", "#95a5a6"])
+    ax.bar(sentiment_counts.index, sentiment_counts.values, color=["#95a5a6", "#95a5a6", "#95a5a6"])
 
     # Add labels and titles
     ax.set_xlabel("Sentiment")
@@ -19,3 +21,41 @@ def plot_sentiment_hist(df, save_path=None):
     # Save the figure if a save path is provided
     if save_path:
         fig.savefig(save_path, dpi=300, bbox_inches="tight")
+
+
+import os
+import sys
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def plot_performance(input_file, output_file):
+    df = pd.read_csv(input_file)
+
+    models = df.iloc[:, 0]
+    metrics = df.iloc[:, 1:].astype(float)
+    accuracy = metrics['accuracy']
+    precision = metrics['precision']
+    recall = metrics['recall']
+    f1_score = metrics['f1_score']
+
+    barWidth = 0.2
+
+    r1 = np.arange(len(models))
+    r2 = [x + barWidth for x in r1]
+    r3 = [x + barWidth for x in r2]
+    r4 = [x + barWidth for x in r3]
+
+    plt.bar(r1, accuracy, color='royalblue', width=barWidth, edgecolor='white', label='Accuracy')
+    plt.bar(r2, precision, color='lightsteelblue', width=barWidth, edgecolor='white', label='Precision')
+    plt.bar(r3, recall, color='cornflowerblue', width=barWidth, edgecolor='white', label='Recall')
+    plt.bar(r4, f1_score, color='steelblue', width=barWidth, edgecolor='white', label='F1 Score')
+
+    plt.xticks([r + barWidth for r in range(len(models))], models)
+    plt.legend()
+    plt.savefig(output_file)
+    plt.show()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.savefig(output_file, format='png', dpi=300)
+    plt.show()

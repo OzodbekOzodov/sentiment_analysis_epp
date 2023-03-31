@@ -162,7 +162,7 @@ def evaluation_metrics(logit_evaluation_metrics, nb_evaluation_metrics, svm_eval
     )
 
     # Set the index to model names
-    combined_evaluation_metrics.index = ["logit", "naive_bayes", "svm"]
+    combined_evaluation_metrics.index = ["Logistic regression", "Naive Bayes classifier", "Support Vector Machines"]
 
     # Save the combined evaluation metrics as a CSV file
     combined_evaluation_metrics.to_csv(output_csv_path, index_label="Model")
