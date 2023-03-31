@@ -31,9 +31,9 @@ SRC = Path(__file__).resolve().parent.parent
 BLD = SRC / "bld"
 
 @pytask.mark.depends_on(
-    {
-        SRC / "bld" / "python" / "evaluation_metrics.csv",
-    })
+    [
+        BLD / "python" / "evaluation_metrics.csv"
+    ])
 @pytask.mark.produces(BLD / "python" / "results" / "performance_bar.png")
 def task_plot_performance(depends_on, produces):
     # Define the input file containing the evaluation metrics

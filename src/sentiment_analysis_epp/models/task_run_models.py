@@ -92,6 +92,11 @@ def task_run_logit(depends_on, produces):
     return None
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
 @pytask.mark.produces(BLD / "python" / "models" / "naive_bayes_model.pkl")
+@pytask.mark.produces([
+    BLD / "python" / "models" / "naive_bayes_model.pkl",
+    BLD / "python" / "evaluation_metrics_nb.csv",
+    BLD / "python" / "conf_matrix_nb.tex"
+])
 def task_run_naive_bayes(depends_on, produces):
     # Load preprocessed data
     with open(depends_on, "rb") as f:
@@ -153,3 +158,30 @@ def task_run_svm(depends_on, produces):
     conf_matrix_svm.style.to_latex(produces[2])
 
     return None
+
+import pytask
+from pathlib import Path
+import pandas as pd
+from sentiment_analysis_epp.models.plots import plot_sentiment_hist
+
+SRC = Path(__file__).resolve().parent
+BLD = SRC / "bld" / "python"
+
+@pytask.mark.depends_on([
+    BLD / "data" / "preprocessed_data.pkl",
+    BLD / "python" / "evaluation_metrics_logit.csv",
+    BLD / "python" / "evaluation_metrics_nb.csv",
+    BLD / "python" / "evaluation_metrics_svm.csv",
+])
+@pytask.mark.produces(BLD / "python" / "evaluation_metrics.csv")
+def task_evaluation_metrics(depends_on, produces):
+    # Read in the evaluation metrics for each model
+    logit_metrics = pd.read_csv(depends_on[1], index_col="Model")
+    nb_metrics = pd.read_csv(depends_on[2], index_col="Model")
+    svm_metrics = pd.read_csv(depends_on[3], index_col="Model")
+
+    # Concatenate the evaluation metrics DataFrames
+    combined_metrics = pd.concat([logit_metrics, nb_metrics, svm_metrics])
+
+    # Save the combined evaluation metrics as a CSV file
+    combined_metrics.to_csv(produces, index_label="Model")
