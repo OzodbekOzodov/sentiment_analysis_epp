@@ -42,6 +42,6 @@ Once all tasks have been done, a PDF file named paper_py.pdf will be generated i
 
 This project was created with [cookiecutter](https://github.com/audreyr/cookiecutter)
 and the
-[cookiecutter-pytask-project](https://github.com/pytask-dev/cookiecutter-pytask-project) under MIT License.
+[cookiecutter-pytask-project](https://github.com/pytask-dev/cookiecutter-pytask-project) template under MIT License.
 
-template.  Special thanks to EPP lecturers Janos Gabler and Hans-Martin von Gaudecker, as well as my friends and colleagues Haris, Luke, Sugarku, and Sharof for sharing ideas and programming experiences.
+Special thanks to EPP lecturers Janos Gabler and Hans-Martin von Gaudecker, as well as my friends and colleagues Haris, Luke, Sugarku, and Sharof for sharing ideas and programming experiences.
