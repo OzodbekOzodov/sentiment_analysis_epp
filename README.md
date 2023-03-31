@@ -10,6 +10,10 @@ To get started, create the environment with
 $ conda env create -f environment.yml
 
 ```
+Then activate the environment with
+```console
+$ conda activate sentiment_analysis_epp
+```
 
 To build the project, type
 
