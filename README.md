@@ -1,16 +1,14 @@
 # Sentiment Analysis in Python Using Kaggle Dataset
+This repository contains code and data for sentiment analysis in Python using a Kaggle dataset. The code is organized into a set of tasks that can be run using the pytask task runner.
 
-[![image](https://img.shields.io/github/actions/workflow/status/ozodbekozodov/sentiment_analysis_epp/main.yml?branch=main)](https://github.com/ozodbekozodov/sentiment_analysis_epp/actions?query=branch%3Amain)  [![image](https://readthedocs.org/projects/sentiment-analysis-epp/badge/?version=stable)](https://sentiment-analysis-epp.readthedocs.io/en/stable/?badge=stable)
-[![image](https://codecov.io/gh/ozodbekozodov/sentiment_analysis_epp/branch/main/graph/badge.svg)](https://codecov.io/gh/ozodbekozodov/sentiment_analysis_epp) 
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/ozodbekozodov/sentiment_analysis_epp/main.svg)](https://results.pre-commit.ci/latest/github/ozodbekozodov/sentiment_analysis_epp/main)
-[![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-
+Author: Ozodbek Ozodov (o.ozodov@outlook.com)
 ## Usage
 
 To get started, create the environment with
 
 ```console
-$ conda/mamba env create
+$ conda env create -f environment.yml
+
 ```
 
 To build the project, type
@@ -18,10 +16,28 @@ To build the project, type
 ```console
 $ pytask
 ```
+# Requirements
+To run the code in this repository, you will need to have the following software installed on your computer:
+
+- Python 3.10
+- pytask
+- scikit-learn
+- matplotlib
+- seaborn
+- numpy
+- pandas
+- nltk
+
+Running the Code
+After activating the environment, you can run the sentiment analysis tasks using the pytask command in the src directory. There are three task files with .py extensions that perform various steps in the sentiment analysis process.
+
+Once all tasks have been run, a PDF file named paper_py.pdf will be generated in the src directory. If you would like to view the paper without running the code, a copy of the PDF is included in the root directory named paper.pdf.
+
 
 ## Credits
 
 This project was created with [cookiecutter](https://github.com/audreyr/cookiecutter)
 and the
-[cookiecutter-pytask-project](https://github.com/pytask-dev/cookiecutter-pytask-project)
-template.
+[cookiecutter-pytask-project](https://github.com/pytask-dev/cookiecutter-pytask-project) under MIT License.
+
+template.  Special thanks to EPP lecturers Janos Gabler and Hans-Martin von Gaudecker, as well as my friends and colleagues Haris, Luke, Sugarku, and Sharof for sharing ideas and programming experiences.
