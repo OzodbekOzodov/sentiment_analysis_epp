@@ -31,7 +31,7 @@ To run the code in this repository, you will need to have the following software
 Running the Code
 After activating the environment, you can run the sentiment analysis tasks using the pytask command in the src directory. There are three task files with .py extensions that perform various steps in the sentiment analysis process.
 
-Once all tasks have been run, a PDF file named paper_py.pdf will be generated in the src directory. If you would like to view the paper without running the code, a copy of the PDF is included in the root directory named paper.pdf.
+Once all tasks have been done, a PDF file named paper_py.pdf will be generated in the src directory. If you would like to see the paper without running the code, a copy of the PDF is included in the root directory named paper.pdf.
 
 
 ## Credits
