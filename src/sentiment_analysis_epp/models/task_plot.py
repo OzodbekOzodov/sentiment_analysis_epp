@@ -31,7 +31,7 @@ BLD = SRC / "bld"
 from sentiment_analysis_epp.models.plots import plot_performance
 
 @pytask.mark.depends_on(SRC / "bld" / "python" / "evaluation_metrics.csv")
-@pytask.mark.produces(BLD / "plots" / f"performance_plot_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+@pytask.mark.produces(BLD / "plots" / "performance_plot.png")
 def task_performance_plot(depends_on, produces):
     # Call the plot_performance function
     plot_performance(input_file=depends_on, output_file=produces)
