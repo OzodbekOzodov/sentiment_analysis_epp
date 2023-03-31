@@ -1,5 +1,5 @@
-# Sentiment Analysis in Python Using Kaggle Dataset
-This repository contains code and data for sentiment analysis in Python using a Kaggle dataset. The code is organized into a set of tasks that can be run using the pytask task runner.
+# Sentiment Analysis in Python Financial News Headlines
+This repository contains code and data for Sentiment Analysis in Python Financial News Headlines using a Kaggle dataset. The code is organized into a set of tasks that can be run using the pytask task runner.
 
 Author: Ozodbek Ozodov (o.ozodov@outlook.com)
 ## Usage

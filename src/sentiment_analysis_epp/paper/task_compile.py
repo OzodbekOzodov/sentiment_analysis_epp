@@ -1,3 +1,4 @@
+"""
 import shutil
 from pathlib import Path
 import pytask
@@ -26,12 +27,13 @@ document = "paper_py"
     ),
 )
 def task_compile_paper():
-    """Compile the paper using LaTeX."""
+   
 kwargs = { "depends_on": SRC / "paper.tex",
           "produces": BLD.parent.resolve() / "paper_py.pdf",
 }       
 
 @pytask.mark.task(id=document, kwargs = kwargs)
 def task_copy_pdf_to_root(depends_on, produces):
-    """Copy the PDF file to the root directory."""
+   
     shutil.copy(depends_on, produces)
+"""

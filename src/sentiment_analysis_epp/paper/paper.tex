@@ -41,9 +41,10 @@
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 % Title
-\title{Sentiment Analysis in Python Using Kaggle Dataset}
+
+\title{Sentiment Analysis in Python Financial News Headlines}
 \author{Ozodbek Ozodov}
-\date{\today}
+
 
 % Begin document
 \begin{document}
@@ -202,24 +203,13 @@ In summary, Support Vector Machines are a powerful machine learning algorithm fo
 %\end{figure}
 
 The table shows the evaluation metrics of three models: Logistic Regression, Naive Bayes Classifier, and Support Vector Machines (SVM). All models achieved high accuracy scores, with SVM having the highest accuracy score of 0.7956. Precision and recall scores were also high for all models, with Logistic Regression and SVM having the highest precision and recall scores. The F1-score, which is the harmonic mean of precision and recall, was highest for Logistic Regression and SVM, indicating that they perform well in balancing precision and recall. Overall, the results suggest that all models perform well in predicting sentiment, with SVM performing slightly better than the other two models.
-\\
 
 %\input{src/sentiment_analysis_epp/bld/python/conf_matrix_logit.tex}
-
-\\
-%The logit model has an overall accuracy of 72.1 percent, with the highest precision for the positive class (64.2 percent) and the highest recall for the neutral class (95.6 percent). The model performs relatively well in differentiating between the positive and negative classes, but struggles more with the neutral class.
-\\
-
+The logit model has an overall accuracy of 72.1 percent, with the highest precision for the positive class (64.2 percent) and the highest recall for the neutral class (95.6 percent). The model performs relatively well in differentiating between the positive and negative classes, but struggles more with the neutral class.
 %\input{src/sentiment_analysis_epp/bld/python/confusion_matrix_svm.tex}
-
-\\
-%Support Vector Machines (SVM) model: The SVM model has a slightly higher overall accuracy of 73.4 percent, with the highest precision for the negative class (73.0 percent) and the highest recall for the neutral class (97.1 percent). The model also performs relatively well in differentiating between the positive and negative classes, but has lower precision and recall compared to the logit model for both classes.
-\\
-
+Support Vector Machines (SVM) model: The SVM model has a slightly higher overall accuracy of 73.4 percent, with the highest precision for the negative class (73.0 percent) and the highest recall for the neutral class (97.1 percent). The model also performs relatively well in differentiating between the positive and negative classes, but has lower precision and recall compared to the logit model for both classes.
 %\input{src/sentiment_analysis_epp/bld/python/conf_matrix_nb.tex}
-
-\\
-%Naive Bayes model: The Naive Bayes model has the lowest overall accuracy of the three models at 60.4 percent, with the highest precision for the positive class (58.9 percent) and the highest recall for the neutral class (97.1 percent). This model performs relatively poorly in differentiating between the positive and negative classes, with low precision and recall for both classes.
+Naive Bayes model: The Naive Bayes model has the lowest overall accuracy of the three models at 60.4 percent, with the highest precision for the positive class (58.9 percent) and the highest recall for the neutral class (97.1 percent). This model performs relatively poorly in differentiating between the positive and negative classes, with low precision and recall for both classes.
 
 
 
