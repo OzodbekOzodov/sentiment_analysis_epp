@@ -1,0 +1,4 @@
+Model,accuracy,precision,recall,f1_score
+Logistic regression,0.85,0.83,0.86,0.84
+Naive Bayes classifier,0.81,0.78,0.83,0.80
+Support Vector Machines,0.87,0.86,0.88,0.87

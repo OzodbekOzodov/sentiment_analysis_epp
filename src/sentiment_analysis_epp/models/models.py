@@ -172,3 +172,4 @@ def evaluation_metrics(logit_evaluation_metrics, nb_evaluation_metrics, svm_eval
 
     return latex_table
 
+

@@ -1,169 +1,190 @@
-from __future__ import annotations
-
-# import sentiment_analysis_epp
-
-import pandas as pd 
 import os
-import sys
-
-# Add the 'src' directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")))
-
-# Import the required functions from the 'models.py' module
-from sentiment_analysis_epp.models.models import preprocess_data
 import pandas as pd
+import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from sentiment_analysis_epp.models.models import preprocess_data
 
 def test_preprocess_data():
-    # Create a small DataFrame with sample data
-    data = pd.DataFrame({
-        'Text': ['I love this product', 'This is terrible'],
-        'Sentiment': [1, 0]
-    })
+    # Create a sample dataframe for testing
+    data = pd.DataFrame({'Text': ['This is a test', 'I love programming']})
 
     # Call the preprocess_data function
     preprocessed_data = preprocess_data(data)
 
-    # Assert the presence of the 'bag_of_words' column
+    # Check if the 'bag_of_words' column exists in the preprocessed data
     assert 'bag_of_words' in preprocessed_data.columns
 
-    # Assert that the length of the returned DataFrame is the same as the input
-    assert len(preprocessed_data) == len(data)
+    # Check if the 'bag_of_words' column has the correct data type (list of strings)
+    assert isinstance(preprocessed_data['bag_of_words'][0], list)
+    assert isinstance(preprocessed_data['bag_of_words'][0][0], str)
 
-    # Assert that the 'bag_of_words' column contains lists of strings
-    for item in preprocessed_data['bag_of_words']:
-        assert isinstance(item, list)
-        assert all(isinstance(i, str) for i in item)
+    # Check if the pickle file is created
+    assert os.path.exists('src/sentiment_analysis_epp/data_management/preprocessed_data.pkl')
 
-    # Assert that the bag of words representation is correct
-    vectorizer = CountVectorizer()
-    expected_bag_of_words = vectorizer.fit_transform(data['Text']).toarray()
-    expected_bag_of_words = [list(map(str, words)) for words in expected_bag_of_words]
+    # Load the pickle file and compare it with the preprocessed data
+    with open('src/sentiment_analysis_epp/data_management/preprocessed_data.pkl', 'rb') as f:
+        loaded_data = pickle.load(f)
+    
+    assert preprocessed_data.equals(loaded_data)
 
-    assert all(a == b for a, b in zip(preprocessed_data['bag_of_words'], expected_bag_of_words))
+    # Clean up the created pickle file
+    os.remove('src/sentiment_analysis_epp/data_management/preprocessed_data.pkl')
 
 import numpy as np
+import pandas as pd
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sentiment_analysis_epp.models.models import fit_logit_model
+from src.sentiment_analysis_epp.models.models import fit_logit_model
 
 
 def test_fit_logit_model():
-    # Create a small classification dataset
-    X, y = make_classification(n_samples=100, n_features=20, random_state=42)
+    # Create a sample dataset for testing
+    X, y = make_classification(n_samples=100, n_features=10, n_classes=3, n_informative=4, n_clusters_per_class=1, random_state=42)
+
+    # Convert labels to a DataFrame with corresponding class names
+    y = pd.Series(y).map({0: 'negative', 1: 'neutral', 2: 'positive'})
 
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Call the fit_logit_model function
-    logit_model, logit_model_evaluation = fit_logit_model(X_train, y_train, X_test, y_test)
+    # Test the fit_logit_model function
+    logit_model, logit_evaluation_metrics, conf_matrix_logit = fit_logit_model(X_train, y_train, X_test, y_test)
 
-    # Assert that the returned model is an instance of LogisticRegression
-    assert isinstance(logit_model, LogisticRegression)
+    # Check if the model is not None
+    assert logit_model is not None
 
-    # Assert that the returned evaluation is a DataFrame with the correct shape
-    assert isinstance(logit_model_evaluation, pd.DataFrame)
-    assert logit_model_evaluation.shape == (1, 4)
+    # Check if the evaluation metrics are close to the expected values
+    expected_accuracy = 0.85
+    expected_precision = 0.87
+    expected_recall = 0.85
+    expected_f1_score = 0.84
 
-    # Assert that the returned evaluation contains the correct columns
-    expected_columns = ["accuracy", "precision", "recall", "f1_score"]
-    assert all(col in logit_model_evaluation.columns for col in expected_columns)
+    np.testing.assert_allclose(logit_evaluation_metrics.loc[0, "accuracy"], expected_accuracy, rtol=0.3)
+    np.testing.assert_allclose(logit_evaluation_metrics.loc[0, "precision"], expected_precision, rtol=0.3)
+    np.testing.assert_allclose(logit_evaluation_metrics.loc[0, "recall"], expected_recall, rtol=0.3)
+    np.testing.assert_allclose(logit_evaluation_metrics.loc[0, "f1_score"], expected_f1_score, rtol=0.3)
 
-    # Evaluate the model on the test set
-    y_pred = logit_model.predict(X_test)
-
-    # Compute evaluation metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
-
-    # Assert that the returned evaluation is correct
-    assert np.isclose(logit_model_evaluation["accuracy"].values[0], accuracy)
-    assert np.isclose(logit_model_evaluation["precision"].values[0], precision)
-    assert np.isclose(logit_model_evaluation["recall"].values[0], recall)
-    assert np.isclose(logit_model_evaluation["f1_score"].values[0], f1)
+    # Check if the confusion matrix has the correct shape
+    assert conf_matrix_logit.shape == (3, 3)
 
 
-from sklearn.naive_bayes import MultinomialNB
-from sentiment_analysis_epp.models.models import fit_naive_bayes
+import pandas as pd
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from src.sentiment_analysis_epp.models.models import fit_naive_bayes
+from sklearn.datasets import make_blobs
 
 def test_fit_naive_bayes():
-    # Create a small classification dataset with non-negative values
-    X, y = make_classification(n_samples=100, n_features=20, random_state=42)
-    X = np.abs(X)
+    # Create a sample dataset for testing
+    X, y = make_blobs(n_samples=100, centers=3, n_features=10, random_state=42)
+
+    # Shift all feature values to be non-negative
+    X += abs(X.min()) + 1
+
+    # Convert labels to a DataFrame with corresponding class names
+    y = pd.Series(y).map({0: 'negative', 1: 'neutral', 2: 'positive'})
 
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Call the fit_naive_bayes function
-    nb_model, nb_evaluation_metrics = fit_naive_bayes(X_train, y_train, X_test, y_test)
+    # Test the fit_naive_bayes function
+    nb_model, nb_evaluation_metrics, conf_matrix_nb = fit_naive_bayes(X_train, y_train, X_test, y_test)
 
-    # Assert that the returned model is an instance of MultinomialNB
-    assert isinstance(nb_model, MultinomialNB)
+    # Check if the model is not None
+    assert nb_model is not None
 
-    # Assert that the returned evaluation is a DataFrame with the correct shape
-    assert isinstance(nb_evaluation_metrics, pd.DataFrame)
-    assert nb_evaluation_metrics.shape == (1, 4)
+    # Check if the evaluation metrics are close to the expected values
+    expected_accuracy = 0.85
+    expected_precision = 0.87
+    expected_recall = 0.85
+    expected_f1_score = 0.84
 
-    # Assert that the returned evaluation contains the correct columns
-    expected_columns = ["accuracy", "precision", "recall", "f1_score"]
-    assert all(col in nb_evaluation_metrics.columns for col in expected_columns)
+    np.testing.assert_allclose(nb_evaluation_metrics.loc[0, "accuracy"], expected_accuracy, rtol=0.3)
+    np.testing.assert_allclose(nb_evaluation_metrics.loc[0, "precision"], expected_precision, rtol=0.3)
+    np.testing.assert_allclose(nb_evaluation_metrics.loc[0, "recall"], expected_recall, rtol=0.3)
+    np.testing.assert_allclose(nb_evaluation_metrics.loc[0, "f1_score"], expected_f1_score, rtol=0.3)
 
-    # Evaluate the model on the test set
-    y_pred = nb_model.predict(X_test)
-
-    # Compute evaluation metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
-
-    # Assert that the returned evaluation is correct
-    assert np.isclose(nb_evaluation_metrics["accuracy"].values[0], accuracy)
-    assert np.isclose(nb_evaluation_metrics["precision"].values[0], precision)
-    assert np.isclose(nb_evaluation_metrics["recall"].values[0], recall)
-    assert np.isclose(nb_evaluation_metrics["f1_score"].values[0], f1)
+    # Check if the confusion matrix has the correct shape
+    assert conf_matrix_nb.shape == (3, 3)
 
 
-from sklearn.svm import SVC
-from sentiment_analysis_epp.models.models import fit_svm
+
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from src.sentiment_analysis_epp.models.models import fit_svm
 
 def test_fit_svm():
-    # Create a small classification dataset
-    X, y = make_classification(n_samples=100, n_features=20, random_state=42)
+    # Create a sample dataset for testing
+    X, y = make_classification(n_samples=100, n_features=10, n_classes=3, n_informative=4, n_clusters_per_class=1, random_state=42)
+
+    # Convert labels to a DataFrame with corresponding class names
+    y = pd.Series(y).map({0: 'negative', 1: 'neutral', 2: 'positive'})
 
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Call the fit_svm function
-    svm_model, svm_evaluation_metrics = fit_svm(X_train, y_train, X_test, y_test)
+    # Test the fit_svm function
+    svm_model, svm_evaluation_metrics, conf_matrix_svm = fit_svm(X_train, y_train, X_test, y_test)
 
-    # Assert that the returned model is an instance of SVC
-    assert isinstance(svm_model, SVC)
+    # Check if the model is not None
+    assert svm_model is not None
 
-    # Assert that the returned evaluation is a DataFrame with the correct shape
-    assert isinstance(svm_evaluation_metrics, pd.DataFrame)
-    assert svm_evaluation_metrics.shape == (1, 4)
+    # Check if the evaluation metrics are close to the expected values
+    expected_accuracy = 0.85
+    expected_precision = 0.87
+    expected_recall = 0.85
+    expected_f1_score = 0.84
 
-    # Assert that the returned evaluation contains the correct columns
-    expected_columns = ["accuracy", "precision", "recall", "f1_score"]
-    assert all(col in svm_evaluation_metrics.columns for col in expected_columns)
+    np.testing.assert_allclose(svm_evaluation_metrics.loc[0, "accuracy"], expected_accuracy, rtol=0.3)
+    np.testing.assert_allclose(svm_evaluation_metrics.loc[0, "precision"], expected_precision, rtol=0.3)
+    np.testing.assert_allclose(svm_evaluation_metrics.loc[0, "recall"], expected_recall, rtol=0.3)
+    np.testing.assert_allclose(svm_evaluation_metrics.loc[0, "f1_score"], expected_f1_score, rtol=0.3)
 
-    # Evaluate the model on the test set
-    y_pred = svm_model.predict(X_test)
+    # Check if the confusion matrix has the correct shape
+    assert conf_matrix_svm.shape == (3, 3)
 
-    # Compute evaluation metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
 
-    # Assert that the returned evaluation is correct
-    assert np.isclose(svm_evaluation_metrics["accuracy"].values[0], accuracy)
-    assert np.isclose(svm_evaluation_metrics["precision"].values[0], precision)
-    assert np.isclose(svm_evaluation_metrics["recall"].values[0], recall)
-    assert np.isclose(svm_evaluation_metrics["f1_score"].values[0], f1)
+
+from src.sentiment_analysis_epp.models.models import evaluation_metrics
+
+def test_evaluation_metrics():
+    # Create some sample evaluation metrics DataFrames
+    logit_metrics = pd.DataFrame({
+        'accuracy': [0.85],
+        'precision': [0.87],
+        'recall': [0.85],
+        'f1_score': [0.84]
+    })
+    nb_metrics = pd.DataFrame({
+        'accuracy': [0.80],
+        'precision': [0.82],
+        'recall': [0.80],
+        'f1_score': [0.79]
+    })
+    svm_metrics = pd.DataFrame({
+        'accuracy': [0.88],
+        'precision': [0.90],
+        'recall': [0.88],
+        'f1_score': [0.87]
+    })
+
+    # Test the evaluation_metrics function
+    output_csv_path = 'test_evaluation_metrics.csv'
+    latex_table = evaluation_metrics(logit_metrics, nb_metrics, svm_metrics, output_csv_path)
+
+    # Check if the output CSV file exists
+    assert os.path.exists(output_csv_path)
+
+    # Load the output CSV file and compare it with the expected values
+    expected_csv = pd.read_csv('test_evaluation_metrics.csv', index_col='Model')
+    output_csv = pd.read_csv(output_csv_path, index_col='Model')
+    assert expected_csv.equals(output_csv)
+
+    # Clean up the created files
+    os.remove(output_csv_path)

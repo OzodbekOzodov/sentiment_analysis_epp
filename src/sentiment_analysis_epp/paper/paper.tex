@@ -1,14 +1,17 @@
 \documentclass{article}
-\documentclass[12pt,a4paper]{article}
+\usepackage{hyperref}
+
 \renewcommand{\baselinestretch}{1.5}
 \usepackage[left=3cm,right=3cm,top=3cm,bottom=3cm]{geometry}
 \usepackage{datetime} 
-\newdateformat{monthyear}{%
-  \monthname[\THEMONTH], \THEYEAR}
+
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage[utf8]{inputenc}
+
 
 \usepackage{graphicx}
 
-\usepackage{natbib} % need for nice bibliography
 \usepackage{xcolor}
 \usepackage[colorlinks = true,
             linkcolor = blue,
@@ -77,6 +80,31 @@ This paper provides a comprehensive overview of the field of sentiment analysis,
 Socher, R., Perelygin, A., Wu, J.Y., Chuang, J., Manning, C.D., Ng, A. and Potts, C. (2013). Recursive deep models for semantic compositionality over a sentiment treebank. In Proceedings of the conference on empirical methods in natural language processing (EMNLP), pp. 1631-1642. This paper proposes a recursive neural network architecture for sentiment analysis that builds a parse tree of a sentence and assigns sentiment labels to each subtree. The model achieved state-of-the-art performance on the Stanford Sentiment Treebank dataset, and the method of building a parse tree has since become a common approach in deep learning for natural language processing.
 
 Mohammad, S.M. and Turney, P.D. (2010). Emotions evoked by common words and phrases: Using Mechanical Turk to create an emotion lexicon. In Proceedings of the NAACL HLT 2010 workshop on computational approaches to analysis and generation of emotion in text, pp. 26-34. This paper describes an approach for creating an emotion lexicon, which maps words and phrases to emotion labels such as joy, anger, and sadness. The authors used crowdsourcing on Amazon Mechanical Turk to collect ratings of emotion for a large number of words and phrases. This type of lexicon is useful for sentiment analysis, as it provides a way to quantify the emotional content of text beyond simply positive or negative sentiment.
+
+\section{Data}
+The data used in this study was obtained from Kaggle.com, a popular platform for sharing and discovering datasets. The initial dataset contained 3500 observations, with two columns: the financial news headline and its respective sentiment. However, due to an overabundance of neutral sentiments, which had the potential to lead to overfitting, 30\% of neutrals were randomly removed from the dataset.
+
+The remaining dataset had a very low percentage of negative sentiments (8\%), which would have negatively impacted the performance of the predictive algorithms used in this study. To address this issue, ChatGPT was utilized to generate negative sentiments and rebalance the dataset. As a result of these preprocessing steps, the final version of the dataset contained approximately 3100 observations.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{src/sentiment_analysis_epp/bld/plots/sentiment_hist.png}
+  \caption{Histogram of sentiment values.}
+  \label{fig:sentiment_hist}
+\end{figure}
+
+Data preprocessing is carried out in three steps:
+
+Lemmatization: Lemmatization is the process of reducing a word to its base or root form, known as its lemma. For example, the word "am," "are," and "is" are all forms of the verb "to be" and can be reduced to the base form "be." By reducing words to their base form, we can simplify the text data and make it easier to analyze.
+
+Tokenization: Tokenization is the process of breaking text data into individual units or tokens, such as words or phrases. This is an important step in NLP because it allows us to analyze and manipulate the text on a granular level. Tokenization can be performed at various levels of granularity, such as word-level, sentence-level, or even character-level.
+
+Vectorizing: Vectorizing is the process of converting text data into a numerical representation that can be used by machine learning algorithms. One common technique for vectorizing text data is bag-of-words representation, which involves creating a matrix where each row represents a document, and each column represents a unique word in the corpus. The entries in the matrix are then the frequency of occurrence of the corresponding word in the corresponding document. Another common technique is using word embeddings, which maps each word to a vector of real numbers, so that similar words have similar vectors.
+
+Algorithms were used to analyze and predict the sentiment of the financial news headlines based on the numerical representation of the data. Overall, this study employed a rigorous approach to data cleaning, preprocessing, and analysis to ensure the accuracy and reliability of the findings.
+
+
 % Methodology
 \section{Methodology}
 
@@ -163,47 +191,34 @@ One advantage of SVMs is their ability to handle high-dimensional data and non-l
 However, SVMs can be computationally intensive and require careful selection of hyperparameters, such as the choice of kernel function and the regularization parameter.
 
 In summary, Support Vector Machines are a powerful machine learning algorithm for classification problems, such as financial news sentiment analysis. By finding the hyperplane that maximizes the margin between the classes, SVMs can accurately classify headlines as positive, negative, or neutral based on the presence of certain words or phrases. While SVMs have certain advantages and limitations, they remain a popular and effective approach to classification problems in finance and other fields.
-
-\subsection{Conditional Random Field}
-
-Conditional Random Fields (CRFs) are a probabilistic graphical model that is widely used for sequence labeling tasks, such as named entity recognition and part-of-speech tagging. In the context of sentiment analysis using financial news headlines, CRFs can be used to label each word in the headline as positive, negative, or neutral based on the context of the entire headline.
-
-To use CRFs for this task, the input is typically represented as a sequence of words or tokens, where each token is associated with a set of features that capture the relevant information for sentiment analysis. These features might include the presence of certain keywords or phrases, as well as more complex features such as the part-of-speech or the dependency parse tree of the token.
-
-Mathematically, the CRF model defines a conditional probability distribution over the possible sequence labels given the input sequence of features. Specifically, the model computes the probability of a sequence of labels $\mathbf{y}$ given a sequence of features $\mathbf{x}$ as follows:
-
-
-P(y|x) = $\frac{1}{z(x)}$     exp\left\{\sum_{i=1}^{n} \sum_{j=1}^{k} w_i f_i (y_i, y_{i-1}, x,i)\right\}
-
-
-where $n$ is the length of the input sequence, $k$ is the number of unique transition features, $w_j$ is the weight parameter associated with the $j$th transition feature, $f_j(y_i, y_{i-1}, \mathbf{x}, i)$ is the value of the $j$th transition feature function for the labels $y_i$ and $y_{i-1}$ at position $i$ in the sequence, and $Z(\mathbf{x})$ is the normalization constant that ensures the probabilities sum to 1.
-
-The goal of training a CRF model is to estimate the optimal weight parameters that maximize the likelihood of the observed data. This is typically done using the maximum likelihood estimation method or its variants, such as the gradient descent algorithm.
-
-One advantage of CRFs is their ability to model dependencies between adjacent labels in the input sequence, which can capture the context and correlation between words in a sentence. Additionally, CRFs can handle both categorical and continuous input features, making them a versatile modeling approach.
-
-However, CRFs can be computationally expensive to train and may require careful feature engineering to achieve optimal performance.
-
-In summary, Conditional Random Fields are a probabilistic graphical model that is widely used for sequence labeling tasks, such as financial news sentiment analysis. By modeling the dependencies between adjacent labels in the input sequence, CRFs can accurately label each word in the headline as positive, negative, or neutral based on the context of the entire headline. While CRFs have certain advantages and limitations, they remain a popular and effective approach to sequence labeling problems in finance and other fields.
-
 % Results
 \section{Results and Model Comparison}
-\subsection{Model Comparison}
 
-\input{../bld/python/evaluation_metrics.tex}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{src/sentiment_analysis_epp/bld/plots/performance_plot_*.png}
+  \caption{Caption text goes here.}
+  \label{fig:performance}
+\end{figure}
 
 The table shows the evaluation metrics of three models: Logistic Regression, Naive Bayes Classifier, and Support Vector Machines (SVM). All models achieved high accuracy scores, with SVM having the highest accuracy score of 0.7956. Precision and recall scores were also high for all models, with Logistic Regression and SVM having the highest precision and recall scores. The F1-score, which is the harmonic mean of precision and recall, was highest for Logistic Regression and SVM, indicating that they perform well in balancing precision and recall. Overall, the results suggest that all models perform well in predicting sentiment, with SVM performing slightly better than the other two models.
+\\
 
-\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_logit.tex}
+\input{src/sentiment_analysis_epp/bld/python/conf_matrix_logit.tex}
 
+\\
 The logit model has an overall accuracy of 72.1 percent, with the highest precision for the positive class (64.2 percent) and the highest recall for the neutral class (95.6 percent). The model performs relatively well in differentiating between the positive and negative classes, but struggles more with the neutral class.
+\\
 
-\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_svm.tex} 
+\input{src/sentiment_analysis_epp/bld/python/confusion_matrix_svm.tex}
 
+\\
 Support Vector Machines (SVM) model: The SVM model has a slightly higher overall accuracy of 73.4 percent, with the highest precision for the negative class (73.0 percent) and the highest recall for the neutral class (97.1 percent). The model also performs relatively well in differentiating between the positive and negative classes, but has lower precision and recall compared to the logit model for both classes.
+\\
 
-\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_nb.tex} 
+\input{src/sentiment_analysis_epp/bld/python/conf_matrix_nb.tex}
 
+\\
 Naive Bayes model: The Naive Bayes model has the lowest overall accuracy of the three models at 60.4 percent, with the highest precision for the positive class (58.9 percent) and the highest recall for the neutral class (97.1 percent). This model performs relatively poorly in differentiating between the positive and negative classes, with low precision and recall for both classes.
 
 
@@ -236,15 +251,17 @@ Another challenge I faced was the lack of interpretability of the models. While 
 
 Overall, the findings suggest that simple machine learning models like logistic regression, naive Bayes classifier, and support vector machines can be effective for sentiment analysis tasks on short text reviews. Future work can focus on improving the performance of these models through feature engineering or exploring more sophisticated machine learning techniques.
 
-% References
-\bibliographystyle{apa}
-\bibliography{refs}
+\newpage
+\pagebreak[]
 
-\begin{frame}[allowframebreaks]
-  \frametitle{References}
-  \renewcommand{\bibfont}{\normalfont\footnotesize}
-  \printbibliography
-\end{frame}
+References
 
-\end{document}
+1. Rao, D. (2019). Multi-Class Text Classification with Scikit-Learn. Towards Data Science. Retrieved from \href{https://towardsdatascience.com/multi-class-text-classification-with-scikit-learn-12f1e60e0a9f.}
+
+2. Karambelkar, A. (2018). Stock News Sentiment Analysis with Python. Towards Data Science. Retrieved from \href{https://towardsdatascience.com/stock-news-sentiment-analysis-with-python-193d4b4378d4 }
+
+3. Schwartz, H. A., & Ungar, L. H. (2015). Data-Driven Content Analysis of Social Media: A Systematic Overview of Automated Methods. The Annals of the American Academy of Political and Social Science, 659, 78-94. 
+
+4. Song, Z., & Xia, J. (2016). Spatial and Temporal Sentiment Analysis of Twitter data. In European Handbook of Crowdsourced Geographic Information (pp. 205-222). Ubiquity Press. 
+
 \end{document}
