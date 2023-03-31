@@ -187,19 +187,64 @@ However, CRFs can be computationally expensive to train and may require careful 
 In summary, Conditional Random Fields are a probabilistic graphical model that is widely used for sequence labeling tasks, such as financial news sentiment analysis. By modeling the dependencies between adjacent labels in the input sequence, CRFs can accurately label each word in the headline as positive, negative, or neutral based on the context of the entire headline. While CRFs have certain advantages and limitations, they remain a popular and effective approach to sequence labeling problems in finance and other fields.
 
 % Results
-\section{Results}
-This section should present the main findings of the research.
+\section{Results and Model Comparison}
+\subsection{Model Comparison}
+
+\input{../bld/python/evaluation_metrics.tex}
+
+The table shows the evaluation metrics of three models: Logistic Regression, Naive Bayes Classifier, and Support Vector Machines (SVM). All models achieved high accuracy scores, with SVM having the highest accuracy score of 0.7956. Precision and recall scores were also high for all models, with Logistic Regression and SVM having the highest precision and recall scores. The F1-score, which is the harmonic mean of precision and recall, was highest for Logistic Regression and SVM, indicating that they perform well in balancing precision and recall. Overall, the results suggest that all models perform well in predicting sentiment, with SVM performing slightly better than the other two models.
+
+\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_logit.tex}
+
+The logit model has an overall accuracy of 72.1 percent, with the highest precision for the positive class (64.2 percent) and the highest recall for the neutral class (95.6 percent). The model performs relatively well in differentiating between the positive and negative classes, but struggles more with the neutral class.
+
+\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_svm.tex} 
+
+Support Vector Machines (SVM) model: The SVM model has a slightly higher overall accuracy of 73.4 percent, with the highest precision for the negative class (73.0 percent) and the highest recall for the neutral class (97.1 percent). The model also performs relatively well in differentiating between the positive and negative classes, but has lower precision and recall compared to the logit model for both classes.
+
+\input{../src/sentiment_analysis_epp/bld/python/conf_matrix_nb.tex} 
+
+Naive Bayes model: The Naive Bayes model has the lowest overall accuracy of the three models at 60.4 percent, with the highest precision for the positive class (58.9 percent) and the highest recall for the neutral class (97.1 percent). This model performs relatively poorly in differentiating between the positive and negative classes, with low precision and recall for both classes.
+
+
 
 % Discussion
 \section{Discussion}
-This section should interpret and analyze the results, and discuss their implications.
+The results obtained from the three models indicate that all models have reasonable performance in classifying sentiments in the given dataset. However, there are some differences between the models in terms of their accuracy, precision, recall, and F1 score.
+
+The logistic regression and support vector machines models show similar performance, with slightly better results for the support vector machines model. On the other hand, the naive Bayes classifier has lower accuracy, precision, recall, and F1 score compared to the other models.
+
+One possible explanation for the differences in performance between the models is the complexity of the dataset. The dataset may have inherent complexities that make it difficult for the models to distinguish between the different sentiment classes. Another factor that could affect the performance is the choice of features and their representation.
+
+To improve the performance of the models, additional data preprocessing and feature engineering techniques can be employed. For example, a more comprehensive data cleaning process could be applied to reduce noise and improve the quality of the data. Additionally, more advanced feature selection and extraction techniques could be employed to identify the most important features for the classification task.
+
+While neural networks have shown significant success in various machine learning tasks, they were not used in this study due to their computational complexity and interpretability challenges. Neural networks require more computation power and time compared to traditional machine learning models, and the black-box nature of neural networks makes it difficult to interpret their decision-making process.
+
+In conclusion, the results obtained from the models indicate that sentiment analysis is a challenging task, and there is still room for improvement in the accuracy and performance of the models. However, with further refinement of data preprocessing techniques and feature engineering, it is possible to improve the performance of the models. Additionally, while neural networks have shown significant promise in various machine learning tasks, they were not used in this study due to their computational complexity and interpretability challenges.
+
 
 % Conclusion
 \section{Conclusion}
-This section should summarize the main points of the paper and provide conclusions.
+
+In this project, I performed sentiment analysis on a dataset of online reviews using three different models: logistic regression, naive Bayes classifier, and support vector machines. I evaluated the performance of these models using four evaluation metrics: accuracy, precision, recall, and F1 score.
+
+The results showed that all three models achieved comparable performance in terms of accuracy, precision, recall, and F1 score. However, the logistic regression and support vector machines models slightly outperformed the naive Bayes classifier in terms of F1 score.
+
+One possible reason for the similar performance of the models could be the nature of the dataset, which contains short text reviews with a limited vocabulary. In such cases, simple models like logistic regression, naive Bayes classifier, and support vector machines can perform reasonably well.
+
+Another challenge I faced was the lack of interpretability of the models. While neural networks have been shown to outperform traditional machine learning models in various natural language processing tasks, they suffer from the challenge of interpretability. Therefore, I did not consider neural networks for sentiment analysis in this project.
+
+Overall, the findings suggest that simple machine learning models like logistic regression, naive Bayes classifier, and support vector machines can be effective for sentiment analysis tasks on short text reviews. Future work can focus on improving the performance of these models through feature engineering or exploring more sophisticated machine learning techniques.
 
 % References
 \bibliographystyle{apa}
-\bibliography{references}
+\bibliography{refs}
 
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \renewcommand{\bibfont}{\normalfont\footnotesize}
+  \printbibliography
+\end{frame}
+
+\end{document}
 \end{document}

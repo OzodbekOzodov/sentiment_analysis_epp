@@ -21,7 +21,7 @@ dependencies:
   - numpy
   - pandas
   - pip
-  - python-crfsuite
+  - pytask-latex>=0.2
   # Misc
   - black
   - ipython
