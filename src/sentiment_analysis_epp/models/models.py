@@ -24,6 +24,7 @@ def preprocess_data(data):
 
     return data
 
+from sklearn.metrics import confusion_matrix
 
 def fit_logit_model(X_train, y_train, X_test, y_test):
     # Fit the logistic regression model
@@ -38,16 +39,29 @@ def fit_logit_model(X_train, y_train, X_test, y_test):
     precision = precision_score(y_test, y_pred, average='weighted')
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
+    from sklearn.metrics import confusion_matrix
+
+    def confusion_matrix_with_labels(y_true, y_pred, labels):
+        cm = confusion_matrix(y_true, y_pred, labels=["negative", "neutral", "positive"])
+        cm_df = pd.DataFrame(cm, index=labels, columns=labels)
+        row_sums = np.asarray(cm_df.sum(axis=1))
+        cm_df_percent = cm_df / row_sums[:, np.newaxis]
+        return cm_df_percent
+    conf_matrix_logit = confusion_matrix_with_labels(y_test, y_pred, labels=["negative", "neutral", "positive"])
 
     # Store the evaluation metrics in a dictionary
-    logit_model_evaluation = pd.DataFrame.from_dict({
+    logit_evaluation_metrics = pd.DataFrame.from_dict({
         "accuracy": [accuracy],
         "precision": [precision],
         "recall": [recall],
         "f1_score": [f1]
     })
 
-    return logit_model, logit_model_evaluation
+    # Store the confusion matrix in a separate DataFrame
+    conf_matrix_logit = pd.DataFrame(conf_matrix_logit)
+
+    return logit_model, logit_evaluation_metrics, conf_matrix_logit
+
 
 
 
@@ -66,6 +80,15 @@ def fit_naive_bayes(X_train, y_train, X_test, y_test):
     precision = precision_score(y_test, y_pred, average='weighted')
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
+    from sklearn.metrics import confusion_matrix
+
+    def confusion_matrix_with_labels(y_true, y_pred, labels):
+        cm = confusion_matrix(y_true, y_pred, labels=["negative", "neutral", "positive"])
+        cm_df = pd.DataFrame(cm, index=labels, columns=labels)
+        row_sums = np.asarray(cm_df.sum(axis=1))
+        cm_df_percent = cm_df / row_sums[:, np.newaxis]
+        return cm_df_percent
+    conf_matrix_nb = confusion_matrix_with_labels(y_test, y_pred, labels=["negative", "neutral", "positive"])
 
     # Create a pandas DataFrame with the evaluation metrics
     nb_evaluation_metrics = pd.DataFrame({
@@ -74,13 +97,15 @@ def fit_naive_bayes(X_train, y_train, X_test, y_test):
         'recall': [recall],
         'f1_score': [f1]
     })
-
-    return nb_model, nb_evaluation_metrics
+    # Store the confusion matrix in a separate DataFrame
+    conf_matrix_nb= pd.DataFrame(conf_matrix_nb)
+    return nb_model, nb_evaluation_metrics, conf_matrix_nb
 
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 def fit_svm(X_train, y_train, X_test, y_test):
     """Fit a Support Vector Machine classifier to data.
@@ -104,7 +129,16 @@ def fit_svm(X_train, y_train, X_test, y_test):
     precision = precision_score(y_test, y_pred, average='weighted')
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
+    from sklearn.metrics import confusion_matrix
 
+    def confusion_matrix_with_labels(y_true, y_pred, labels):
+        cm = confusion_matrix(y_true, y_pred, labels=["negative", "neutral", "positive"])
+        cm_df = pd.DataFrame(cm, index=labels, columns=labels)
+        row_sums = np.asarray(cm_df.sum(axis=1))
+        cm_df_percent = cm_df / row_sums[:, np.newaxis]
+        return cm_df_percent
+
+    conf_matrix_svm = confusion_matrix_with_labels(y_test, y_pred, labels=["negative", "neutral", "positive"])
     # Create a pandas DataFrame with the evaluation metrics
     svm_evaluation_metrics = pd.DataFrame({
         'accuracy': [accuracy],
@@ -112,108 +146,29 @@ def fit_svm(X_train, y_train, X_test, y_test):
         'recall': [recall],
         'f1_score': [f1]
     })
+    # Store the confusion matrix in a separate DataFrame
+    conf_matrix_svm = pd.DataFrame(conf_matrix_svm)
+    return svm_model, svm_evaluation_metrics, conf_matrix_svm
 
-    return svm_model, svm_evaluation_metrics
 
-""" Conditional random field """
-
-import pycrfsuite
+import os
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-def fit_crf(X_train, y_train, X_test, y_test):
-    def prepare_data_for_crf(X, y):
-        X_crf = pd.DataFrame(X.toarray()).apply(lambda x: {str(k): v for k, v in x.to_dict().items()}, axis=1).tolist()
-        y_crf = [[str(label)] for label in y]
-        return X_crf, y_crf
+def evaluation_metrics(logit_evaluation_metrics, nb_evaluation_metrics, svm_evaluation_metrics, output_csv_path):
+    # Concatenate the evaluation metrics DataFrames
+    combined_evaluation_metrics = pd.concat(
+        [logit_evaluation_metrics, nb_evaluation_metrics, svm_evaluation_metrics],
+        axis=0
+    )
 
+    # Set the index to model names
+    combined_evaluation_metrics.index = ["logit", "naive_bayes", "svm"]
 
+    # Save the combined evaluation metrics as a CSV file
+    combined_evaluation_metrics.to_csv(output_csv_path, index_label="Model")
 
-    # Prepare the data for CRF
-    X_train_crf, y_train_crf = prepare_data_for_crf(X_train, y_train)
-    X_test_crf, y_test_crf = prepare_data_for_crf(X_test, y_test)
+    # Convert the combined evaluation metrics to LaTeX format
+    latex_table = combined_evaluation_metrics.style.to_latex()
 
-    # Fit the CRF model
-    trainer = pycrfsuite.Trainer(verbose=False)
+    return latex_table
 
-    for xseq, yseq in zip(X_train_crf, y_train_crf):
-        trainer.append(xseq, yseq)
-
-    trainer.set_params({
-        'c1': 1.0,   # coefficient for L1 penalty
-        'c2': 1e-3,  # coefficient for L2 penalty
-        'max_iterations': 50  # stop earlier
-    })
-
-    trainer.train('crf_model.crfsuite')
-
-    # Evaluate the model on the test set
-    tagger = pycrfsuite.Tagger()
-    tagger.open('crf_model.crfsuite')
-    y_pred = [tagger.tag(xseq)[0] for xseq in X_test_crf]
-
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
-
-    # Create a pandas DataFrame with the evaluation metrics
-    crf_evaluation_metrics = pd.DataFrame({
-        'accuracy': [accuracy],
-        'precision': [precision],
-        'recall': [recall],
-        'f1_score': [f1]
-    })
-
-    return tagger, crf_evaluation_metrics
-
-
-""" Second part of this script contains the codes for unsupervised ML models which does not use sentiment labels"""
-
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-import numpy as np 
-
-def lda_topic_modeling(data, n_topics=20, n_keywords=20):
-    """
-    Perform LDA topic modeling on the given data.
-
-    Args:
-    data (pd.DataFrame): A DataFrame containing the preprocessed data with a 'bag_of_words' column.
-    n_topics (int): The number of topics to generate.
-    n_keywords (int): The number of keywords to display for each topic.
-
-    Returns:
-    data_with_topics (pd.DataFrame): A DataFrame with an additional 'Topic' column containing the topic number.
-    topic_examples (pd.DataFrame): A DataFrame containing one example headline from each topic.
-    """
-
-    # Convert the list of words to a single string
-    data['bag_of_words'] = data['bag_of_words'].apply(lambda x: ' '.join(str(word) for word in x))
-
-    # Initialize a CountVectorizer object with the previously processed bag_of_words data
-    vectorizer = CountVectorizer(analyzer=lambda x: x)
-    bag_of_words = vectorizer.fit_transform(data['bag_of_words'])
-
-    # Perform LDA topic modeling
-    lda = LatentDirichletAllocation(n_components=n_topics)
-    lda.fit(bag_of_words)
-
-    # Get the topic keywords
-    keywords = np.array(vectorizer.get_feature_names_out())
-    topic_keywords = []
-    for topic_weights in lda.components_:
-        top_keyword_locs = (-topic_weights).argsort()[:n_keywords]
-        topic_keywords.append(keywords.take(top_keyword_locs).tolist())
-
-    # Assign a topic to each document
-    topic_values = lda.transform(bag_of_words)
-    data['Topic'] = topic_values.argmax(axis=1)
-
-    # Get one example headline from each topic
-    topic_examples = data.groupby('Topic').first()
-
-    return data, topic_examples

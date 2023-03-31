@@ -5,6 +5,7 @@ from pathlib import Path
 import pytask
 import os
 import sys
+"""
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 SRC = Path(__file__).parent.parent.resolve()
@@ -25,3 +26,4 @@ def task_sentiment_histogram():
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
 
     return None
+"""

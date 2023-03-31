@@ -4,6 +4,7 @@ import pytask
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from pathlib import Path
+from sklearn.model_selection import train_test_split
 
 SRC = Path(__file__).parent.resolve()
 BLD = SRC.joinpath("..", "bld").resolve()
@@ -21,6 +22,8 @@ import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from pathlib import Path
 import pytask
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 
 SRC = Path(__file__).resolve().parent.parent
 BLD = SRC / "bld"
@@ -50,23 +53,16 @@ def task_preprocess_data():
     return None
 
 
-import pandas as pd
 import pickle
-from pathlib import Path
-from sentiment_analysis_epp.models.models import fit_logit_model, fit_naive_bayes, fit_svm, fit_crf
-import pytask
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
 
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
 @pytask.mark.produces([
     BLD / "python" / "models" / "logit_model.pkl",
-    BLD / "python" / "models" / "naive_bayes_model.pkl",
-    BLD / "python" / "models" / "svm_model.pkl",
-    BLD / "python" / "models" / "crf_model.pkl",
-    BLD / "python" / "evaluation_metrics.csv",
+    BLD / "python" / "evaluation_metrics_logit.csv",
+    BLD / "python" / "conf_matrix_logit.tex"
 ])
-def task_run_models(depends_on, produces):
+def task_run_logit(depends_on, produces):
     # Load preprocessed data
     with open(depends_on, "rb") as f:
         data = pickle.load(f)
@@ -78,48 +74,82 @@ def task_run_models(depends_on, produces):
     # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(X, data['Sentiment'], random_state=42)
 
-    # Fit models
-    logit_model, logit_evaluation = fit_logit_model(X_train, y_train, X_test, y_test)
-    nb_model, nb_evaluation = fit_naive_bayes(X_train, y_train, X_test, y_test)
-    svm_model, svm_evaluation = fit_svm(X_train, y_train, X_test, y_test)
-    crf_model, crf_evaluation = fit_crf(X_train, y_train, X_test, y_test)
-    # Save models
+    # Fit the logistic regression model
+    logit_model, logit_evaluation, conf_matrix_logit = fit_logit_model(X_train, y_train, X_test, y_test)
+
+    # Save the logit model
     with open(produces[0], "wb") as f:
         pickle.dump(logit_model, f)
-    with open(produces[1], "wb") as f:
-        pickle.dump(nb_model, f)
-    with open(produces[2], "wb") as f:
-        pickle.dump(svm_model, f)
-    with open(produces[3], "wb") as f:
-        pickle.dump(crf_model, f)
 
+    # Save the logit evaluation metrics
+    logit_evaluation.index = ["logit"]
+    logit_evaluation.to_csv(produces[1], index_label="Model")
 
-    # Save evaluation metrics
-    evaluation_metrics = pd.concat([logit_evaluation, nb_evaluation, svm_evaluation, crf_evaluation], axis=0)
-    evaluation_metrics.index = ["logit", "naive_bayes", "svm", "crf"]
-    evaluation_metrics.to_csv(produces[3], index_label="Model")
+    # Save the logit confusion matrix
+    with open(produces[2], "w") as f:
+        conf_matrix_logit.style.to_latex(buf=f, caption="Confusion matrix for logit model")
 
     return None
-
-
-
-from sentiment_analysis_epp.models.models import lda_topic_modeling
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
-@pytask.mark.produces([
-    BLD / "python" / "models" / "data_with_topics.csv",
-    BLD / "python" / "models" / "topic_examples.csv",
-])
-def task_run_topic_lda(depends_on, produces):
+@pytask.mark.produces(BLD / "python" / "models" / "naive_bayes_model.pkl")
+def task_run_naive_bayes(depends_on, produces):
     # Load preprocessed data
     with open(depends_on, "rb") as f:
         data = pickle.load(f)
 
-    # Run LDA topic modeling
-    data_with_topics, topic_examples = lda_topic_modeling(data, n_topics=20, n_keywords=20) #, random_state=42)
+    # Vectorize the 'Text' column
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(data['Text'])
 
-    # Save DataFrames
-    data_with_topics.to_csv(produces[0],index = False)
-    topic_examples.to_csv(produces[1], index=False)
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, data['Sentiment'], random_state=42)
 
+    # Fit the model
+    nb_model, nb_evaluation_metrics, conf_matrix_nb = fit_naive_bayes(X_train, y_train, X_test, y_test)
+
+    # Save the model
+    with open(produces, "wb") as f:
+        pickle.dump(nb_model, f)
+
+    # Save the evaluation metrics
+    nb_evaluation_metrics.to_csv(BLD / "python" / "evaluation_metrics_nb.csv", index_label="Model")
+
+    # Save the confusion matrix in latex format
+    with open(BLD / "python" / "confusion_matrix_nb.tex", "w") as f:
+        f.write(conf_matrix_nb.style.to_latex())
+
+    return None
+
+
+@pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
+@pytask.mark.produces([
+    BLD / "python" / "models" / "svm_model.pkl",
+    BLD / "python" / "evaluation_metrics_svm.csv",
+    BLD / "python" / "confusion_matrix_svm.tex",
+])
+def task_run_svm(depends_on, produces):
+    # Load preprocessed data
+    with open(depends_on, "rb") as f:
+        data = pickle.load(f)
+
+    # Vectorize the 'Text' column
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(data['Text'])
+
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, data['Sentiment'], random_state=42)
+
+    # Fit SVM model
+    svm_model, svm_evaluation_metrics, conf_matrix_svm = fit_svm(X_train, y_train, X_test, y_test)
+
+    # Save the model
+    with open(produces[0], "wb") as f:
+        pickle.dump(svm_model, f)
+
+    # Save the evaluation metrics
+    svm_evaluation_metrics.to_csv(produces[1], index_label="Model")
+
+    # Save the confusion matrix in LaTeX format
+    conf_matrix_svm.style.to_latex(produces[2])
 
     return None
