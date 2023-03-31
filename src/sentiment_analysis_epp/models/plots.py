@@ -1,11 +1,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 
+<<<<<<< HEAD
 import sys
 print("Importing module:", __name__)
 
 
 def plot_sentiment_hist(df, save_path=None):
+=======
+
+def plot_sentiment_bar(df, save_path=None):
+>>>>>>> working-outputs
     # Count the number of sentiments for each class
     sentiment_counts = df["Sentiment"].value_counts()
 
@@ -13,7 +19,7 @@ def plot_sentiment_hist(df, save_path=None):
     fig, ax = plt.subplots(figsize=(8, 6))
 
     # Create the histogram
-    ax.bar(sentiment_counts.index, sentiment_counts.values, color=["#9b59b6", "#3498db", "#95a5a6"])
+    ax.bar(sentiment_counts.index, sentiment_counts.values, color=["#95a5a6", "#95a5a6", "#95a5a6"])
 
     # Add labels and titles
     ax.set_xlabel("Sentiment")
@@ -25,13 +31,19 @@ def plot_sentiment_hist(df, save_path=None):
         fig.savefig(save_path, dpi=300, bbox_inches="tight")
 
 
+<<<<<<< HEAD
 import os
 import sys
+=======
+>>>>>>> working-outputs
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> working-outputs
 def plot_performance(input_file, output_file):
     df = pd.read_csv(input_file)
 
@@ -49,6 +61,7 @@ def plot_performance(input_file, output_file):
     r3 = [x + barWidth for x in r2]
     r4 = [x + barWidth for x in r3]
 
+<<<<<<< HEAD
     plt.bar(r1, accuracy, color='royalblue', width=barWidth, edgecolor='white', label='Accuracy')
     plt.bar(r2, precision, color='lightsteelblue', width=barWidth, edgecolor='white', label='Precision')
     plt.bar(r3, recall, color='cornflowerblue', width=barWidth, edgecolor='white', label='Recall')
@@ -61,3 +74,20 @@ def plot_performance(input_file, output_file):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.savefig(output_file, format='png', dpi=300)
     plt.show()
+=======
+    # Create a new figure for the second plot with transparent background
+    fig, ax = plt.subplots(figsize=(8, 6))
+    fig.patch.set_alpha(0.0)
+
+    ax.bar(r1, accuracy, color='gray', hatch='////', width=barWidth, edgecolor='white', label='Accuracy')
+    ax.bar(r2, precision, color='gray', hatch='....', width=barWidth, edgecolor='white', label='Precision')
+    ax.bar(r3, recall, color='gray', hatch='xxxx', width=barWidth, edgecolor='white', label='Recall')
+    ax.bar(r4, f1_score, color='gray', hatch='++++', width=barWidth, edgecolor='white', label='F1 Score')
+    ax.set_ylim([0.7, 0.88])
+    ax.set_xticks([r + barWidth for r in range(len(models))])
+    ax.set_xticklabels(models)
+    ax.legend(ncol=4, bbox_to_anchor=(0, -0.15), loc='lower left')
+    
+    # Save the plot as a file
+    fig.savefig(output_file, format='png', dpi=300, bbox_inches="tight", transparent=True)
+>>>>>>> working-outputs

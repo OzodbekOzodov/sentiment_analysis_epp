@@ -91,12 +91,20 @@ def task_run_logit(depends_on, produces):
 
     return None
 @pytask.mark.depends_on(SRC / "bld" / "python" / "data" / "preprocessed_data.pkl")
+<<<<<<< HEAD
 @pytask.mark.produces(BLD / "python" / "models" / "naive_bayes_model.pkl")
 @pytask.mark.produces([
     BLD / "python" / "models" / "naive_bayes_model.pkl",
     BLD / "python" / "evaluation_metrics_nb.csv",
     BLD / "python" / "conf_matrix_nb.tex"
 ])
+=======
+@pytask.mark.produces([
+    BLD / "python" / "models" / "nb_model.pkl",
+    BLD / "python" / "evaluation_metrics_nb.csv",
+    BLD / "python" / "conf_matrix_nb.tex"]
+)
+>>>>>>> working-outputs
 def task_run_naive_bayes(depends_on, produces):
     # Load preprocessed data
     with open(depends_on, "rb") as f:
@@ -113,14 +121,14 @@ def task_run_naive_bayes(depends_on, produces):
     nb_model, nb_evaluation_metrics, conf_matrix_nb = fit_naive_bayes(X_train, y_train, X_test, y_test)
 
     # Save the model
-    with open(produces, "wb") as f:
+    with open(produces[0], "wb") as f:
         pickle.dump(nb_model, f)
 
     # Save the evaluation metrics
-    nb_evaluation_metrics.to_csv(BLD / "python" / "evaluation_metrics_nb.csv", index_label="Model")
+    nb_evaluation_metrics.to_csv(produces[1], index_label="Model")
 
     # Save the confusion matrix in latex format
-    with open(BLD / "python" / "confusion_matrix_nb.tex", "w") as f:
+    with open(produces[2], "w") as f:
         f.write(conf_matrix_nb.style.to_latex())
 
     return None
@@ -159,6 +167,7 @@ def task_run_svm(depends_on, produces):
 
     return None
 
+<<<<<<< HEAD
 import pytask
 from pathlib import Path
 import pandas as pd
@@ -185,3 +194,34 @@ def task_evaluation_metrics(depends_on, produces):
 
     # Save the combined evaluation metrics as a CSV file
     combined_metrics.to_csv(produces, index_label="Model")
+=======
+from sentiment_analysis_epp.models.models import  evaluation_metrics
+@pytask.mark.depends_on([
+    BLD / "python" / "evaluation_metrics_logit.csv",
+    BLD / "python" / "evaluation_metrics_nb.csv",
+    BLD / "python" / "evaluation_metrics_svm.csv"
+])
+@pytask.mark.produces([
+    BLD / "python" / "evaluation_metrics.csv",
+    BLD / "python" / "evaluation_metrics.tex"
+])
+def task_evaluation_metrics(depends_on, produces):
+    # Read the evaluation metrics CSV files for each model
+    logit_evaluation_metrics = pd.read_csv(depends_on[0], index_col="Model")
+    nb_evaluation_metrics = pd.read_csv(depends_on[1], index_col="Model")
+    svm_evaluation_metrics = pd.read_csv(depends_on[2], index_col="Model")
+
+    # Call the evaluation_metrics function
+    latex_table = evaluation_metrics(
+        logit_evaluation_metrics,
+        nb_evaluation_metrics,
+        svm_evaluation_metrics,
+        produces[0]
+    )
+
+    # Save the combined evaluation metrics in LaTeX format
+    with open(produces[1], "w") as f:
+        f.write(latex_table)
+
+    return None
+>>>>>>> working-outputs
