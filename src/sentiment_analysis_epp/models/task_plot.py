@@ -1,32 +1,24 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-from pathlib import Path
 import pytask
-import os
-import sys
-"""
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-SRC = Path(__file__).parent.parent.resolve()
-BLD = SRC.joinpath("bld").resolve()
-
+from pathlib import Path
+import pandas as pd
 from sentiment_analysis_epp.models.plots import plot_sentiment_hist
 
-@pytask.mark.depends_on(SRC / "sentiment_analysis_epp" / "data_management" / "data.csv")
-@pytask.mark.produces(BLD / "python" / "results" / "sentiment_histogram.png")
-def task_sentiment_histogram():
-    # Load the data
-    data_path = SRC / "sentiment_analysis_epp" / "data_management" / "data.csv"
+SRC = Path(__file__).resolve().parent.parent
+BLD = SRC / "bld"
+
+@pytask.mark.depends_on(SRC / "data_management" / "data.csv")
+@pytask.mark.produces(BLD / "python" / "results" / "sentiment_hist.png")
+def task_plot_sentiment_hist(depends_on, produces):
+    data_path = depends_on
+    output_path = produces
+
+    # Read the data into a DataFrame
     df = pd.read_csv(data_path, encoding="ISO-8859-1")
 
-    # Create the plot and save it
-    plot_sentiment_hist(df)
-    output_path = BLD / "python" / "results" / "sentiment_histogram.png"
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    # Call the plot_sentiment_hist() function to create the plot
+    plot_sentiment_hist(df, save_path=output_path)
 
-    return None
-"""
+""" Model performance plot """
 import os
 import sys
 from pathlib import Path
@@ -42,7 +34,7 @@ BLD = SRC / "bld"
     {
         SRC / "bld" / "python" / "evaluation_metrics.csv",
     })
-@pytask.mark.produces(BLD / "python" / "results" / "sentiment_histogram.png")
+@pytask.mark.produces(BLD / "python" / "results" / "performance_bar.png")
 def task_plot_performance(depends_on, produces):
     # Define the input file containing the evaluation metrics
     input_file = depends_on[0]
